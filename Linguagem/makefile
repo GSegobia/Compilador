@@ -1,8 +1,7 @@
 all:
-	flex lex.l
+		clear
+		lex lex.l
+		yacc -d yacc.y
+		g++ -std=c++11 -o juninho y.tab.c -lfl
 
-	bison -d yacc.y
-
-	gcc -o calc yacc.tab.c lex.yy.c -lfl
-
-	./calc
+		./juninho < exemplo.juninho

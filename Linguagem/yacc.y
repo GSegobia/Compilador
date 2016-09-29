@@ -1,43 +1,107 @@
 %{
-#include <stdio.h>
+#include <iostream>
+#include <string>
+#include <sstream>
 
-void yyerror(char *); /* ver abaixo */
+#define YYSTYPE atributos
+
+using namespace std;
+
+struct atributos
+{
+    string label;
+    string traducao;
+    int value;
+};
+
+int yylex(void);
+void yyerror(string);
 %}
 
-%token INTEIRO
-%token FIM_LINHA
+%token TK_NUM
+%token TK_MAIN TK_ID TK_TIPO_INT
+%token TK_FIM TK_ERROR
+
+%start S
+
 %left '+' '-'
 %left '*' '/'
 %left '(' ')'
 
-%start linha
+%%
+
+S           : TK_TIPO_INT TK_MAIN '(' ')' BLOCO
+            {
+                cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl; 
+            }
+            ;
+
+BLOCO       : '{' COMANDOS '}'
+            {
+                $$.traducao = $2.traducao;
+            }
+            ;
+
+COMANDOS    : COMANDO COMANDOS
+            |
+            ;
+
+COMANDO     : E ';'
+            ;
+
+E           : E '+' E
+            {
+                $$.value = $1.value + $3.value;
+                cout << $$.value << "\t" << $$.label << endl;
+                $$.traducao = $1.traducao + $3.traducao + "\ta =" + to_string($$.value) + ";\n";
+            }
+            | E '-' E
+            {
+                $$.value = $1.value - $3.value;
+                cout << $$.value << "\t" << $$.label << endl;
+                $$.traducao = $1.traducao + $3.traducao + "\ta =" + to_string($$.value) + ";\n";
+            }
+            | E '*' E
+            {
+                $$.value = $1.value * $3.value;
+                cout << $$.value << "\t" << $$.label << endl;
+                $$.traducao = $1.traducao + $3.traducao + "\ta =" + to_string($$.value) + ";\n";   
+            }
+            | E '/' E
+            {
+                $$.value = $1.value / $3.value;
+                cout << $$.value << "\t" << $$.label << endl;
+                $$.traducao = $1.traducao + $3.traducao + "\ta =" + to_string($$.value) + ";\n";  
+            }
+            | '(' E ')'
+            {
+                $$.value = ($2.value);
+                cout << $$.value << "\t" << $$.label << endl;
+                $$.traducao = "\ta =" + to_string($$.value) + ";\n";  
+            }
+            | TK_NUM
+            {
+                $$.value = stoi($1.traducao);
+                $$.traducao = "\ta = " + $1.traducao + ";\n";
+            }
+            | TK_ID
+            ;
 
 %%
 
-linha: expressao FIM_LINHA { printf("valor: %d\n", $1); }
-     ;
+#include "lex.yy.c"
 
-expressao: expressao '+' expressao { $$ = $1 + $3; }
-         | termo { $$ = $1; }
-         | expressao '-' expressao { $$ = $1 - $3; }
-         | expressao '*' expressao { $$ = $1 * $3; }
-         | expressao '/' expressao { $$ = $1 / $3; }
-         | expressao '^' { $$ = $1 * $1; }
-         | '(' expressao ')' { $$ = $2; }
-         ;
+int yyparse();
 
-termo: INTEIRO { $$ = $1; }
-     ;
-
-%%
-
-int main(int argc, char **argv)
+int main( int argc, char* argv[] )
 {
-  return yyparse();
+    yyparse();
+
+    return 0;
 }
 
-/* função usada pelo bison para dar mensagens de erro */
-void yyerror(char *msg)
+void yyerror( string MSG )
 {
-  fprintf(stderr, "erro: %s\n", msg);
-}
+    cout << MSG << endl;
+    exit (0);
+}               

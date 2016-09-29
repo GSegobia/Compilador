@@ -1,19 +1,35 @@
 %{
-#include "yacc.tab.h"
+#include <string>
+
 %}
+
+ESPACO [ \t]
+DIGITO [0-9]
+LETRA [A-Za-z_]
+
+DELIM {ESPACO}+
+NUM {DIGITO}+
+REAL {NUM}+("."{NUM}+)?
+CHAR \'({LETRA}|{NUM})\'
+ID {LETRA}({LETRA}|{NUM})*
 
 %%
 
-[0-9]+          yylval = atoi(yytext); return INTEIRO;
+"\n"		{}
 
-"+"             return '+';
-"-"             return '-';
-"*"             return '*';
-"/"             return '/';
-"("             return '(';
-")"             return ')';
-"^"             return '^';
+{DELIM}		{}
 
-[ \t]           ; /* ignora espaços e tabs (\t) */
+"main"		{return TK_MAIN;}
 
-"\n"            return FIM_LINHA;
+"int"		{return TK_TIPO_INT;}
+
+[(){}[\];,]	{ return *yytext; }
+
+[+\-*/]		{ return *yytext; }
+
+{NUM}		{ yylval.traducao = yytext; return TK_NUM; }
+{ID}		{ yylval.label = yytext; return TK_ID; }
+
+.			{ *yytext; }
+
+%%
