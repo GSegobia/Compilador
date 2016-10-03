@@ -11,15 +11,31 @@ struct atributos
 {
     string label;
     string traducao;
+    string tipo;
     int value;
 };
+
+typedef struct{
+
+    string tipo;
+
+}variavel; 
+
+string tabela_operadores = ["int", "float", "+", "float";
+                            "float", "int", "-", "float"];
+
+
+string get_tabela_op(string tp1, string tp2, string op){
+
+
+}
 
 int yylex(void);
 void yyerror(string);
 %}
 
-%token TK_NUM
-%token TK_MAIN TK_ID TK_TIPO_INT
+%token TK_NUM TK_REAL
+%token TK_MAIN TK_ID TK_TIPO_INT TK_TIPO_FLOAT
 %token TK_FIM TK_ERROR
 
 %start S
@@ -83,6 +99,13 @@ E           : E '+' E
             {
                 $$.value = stoi($1.traducao);
                 $$.traducao = "\ta = " + $1.traducao + ";\n";
+                $$.tipo = "int";
+            }
+            | TK_REAL
+            {
+                $$.value = stof($1.traducao);
+                $$.traducao = "\ta = " + $1.traducao + ";\n";  
+                $$.tipo = "float"; 
             }
             | TK_ID
             ;

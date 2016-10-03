@@ -23,11 +23,14 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "int"		{return TK_TIPO_INT;}
 
+"float"		{return TK_TIPO_FLOAT;}
+
 [(){}[\];,]	{ return *yytext; }
 
 [+\-*/]		{ return *yytext; }
 
 {NUM}		{ yylval.traducao = yytext; return TK_NUM; }
+{REAL}		{ yylval.traducao = yytext; return TK_REAL; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
 .			{ *yytext; }
