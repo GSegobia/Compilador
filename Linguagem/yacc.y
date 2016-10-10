@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <cassert>
 
 #define YYSTYPE atributos
 
@@ -21,12 +23,49 @@ typedef struct{
 
 }variavel; 
 
-string tabela_operadores = ["int", "float", "+", "float";
-                            "float", "int", "-", "float"];
+string types[] = {"float", "int"};
 
+string tabela_operadores[][4] = {
+                            {"float", "int", "+", "float"},
+                            {"float", "int", "-", "float"},
+                            {"float", "int", "*", "float"},
+                            {"float", "int", "/", "float"}
+                        };
+
+
+bool validate_types(string type){
+
+    bool valid = false;
+
+    for(int i = 0; i < 2 | valid; i++){
+
+        if(type == types[i]){
+            valid = true;
+        }
+    }
+
+    return valid;
+}
 
 string get_tabela_op(string tp1, string tp2, string op){
 
+    string operation="";
+
+    assert(validate_types(tp1) | validate_types(tp2));
+
+    if(tp1==tp2){
+        return tp1;
+    }
+    else{
+        for(int i=0;i<4;i++){
+            if(tp1 == tabela_operadores[i][0] | tp1 == tabela_operadores[i][1])
+                if(tp2 == tabela_operadores[i][1] | tp2 == tabela_operadores[i][0])
+                    if(op == tabela_operadores[i][2])
+                       return  tabela_operadores[i][3];
+        }
+    }
+
+    return "ERROOOU";
 
 }
 
@@ -95,6 +134,10 @@ E           : E '+' E
                 cout << $$.value << "\t" << $$.label << endl;
                 $$.traducao = "\ta =" + to_string($$.value) + ";\n";  
             }
+            | TK_ID '=' E
+            {
+                $$.traducao = $1.label+"="+$3.label;
+            }
             | TK_NUM
             {
                 $$.value = stoi($1.traducao);
@@ -108,6 +151,9 @@ E           : E '+' E
                 $$.tipo = "float"; 
             }
             | TK_ID
+            {
+                $$.label = $1.label;
+            }
             ;
 
 %%
