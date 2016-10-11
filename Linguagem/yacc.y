@@ -65,7 +65,6 @@ COMANDO     : E ';'
 E           : E '+' E
             {
                 $$.traducao = $1.traducao + $3.traducao + "\ta = b + c;\n";
-                cout << "#" << $1.traducao << " && " << $1.label << endl;
             }
             | E '-' E
             {
@@ -94,12 +93,10 @@ E           : E '+' E
             | TK_ID
             {
                 $$.label = $1.label;
-                cout << $1.label << endl;
             }
             | TK_ID '=' E
             {
                 $$.traducao = $3.traducao;
-                cout << '#' << $1.label << endl;
             }
             ;
 
