@@ -45,7 +45,7 @@ string current_variable();
 
 S           : TK_TIPO_INT TK_MAIN '(' ')' BLOCO
             {
-                cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl; 
+                cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl;
             }
             ;
 
@@ -72,15 +72,15 @@ E           : E '+' E
             }
             | E '*' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b * c;\n";   
+                $$.traducao = $1.traducao + $3.traducao + "\ta = b * c;\n";
             }
             | E '/' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b / c;\n";  
+                $$.traducao = $1.traducao + $3.traducao + "\ta = b / c;\n";
             }
             | '(' E ')'
             {
-                $$.traducao = "\ta = (b);\n";  
+                $$.traducao = "\ta = (b);\n";
             }
             | TK_NUM
             {
@@ -88,7 +88,7 @@ E           : E '+' E
             }
             | TK_REAL
             {
-                $$.traducao = "\ta = " + $1.traducao + ";\n";  
+                $$.traducao = "\ta = " + $1.traducao + ";\n";
             }
             | TK_ID
             {
@@ -97,6 +97,16 @@ E           : E '+' E
             | TK_ID '=' E
             {
                 $$.traducao = $3.traducao;
+            }
+            /*Inserir Temps */
+            | TK_TIPO_INT TK_ID
+            {
+                $$.traducao = "\tint " + $2.label + ";\n";
+            }
+            | TK_TIPO_INT TK_ID '=' E
+            {
+                $$.traducao = "\tint " + $4.traducao + "\n";
+
             }
             ;
 
@@ -107,7 +117,7 @@ E           : E '+' E
 int yyparse();
 
 int main(int argc, char* argv[]){
-    
+
     yyparse();
 
     return 0;
@@ -117,7 +127,7 @@ void yyerror(string MSG){
 
     cout << MSG << endl;
     exit (0);
-}               
+}
 
 bool validate_types(string type){
 
@@ -140,7 +150,7 @@ string get_operation_type(string tp1, string tp2, string op){
     assert(validate_types(tp1) | validate_types(tp2));
 
     if(tp1 == tp2){
-        
+
         return tp1;
     }
     else{
