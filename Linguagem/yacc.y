@@ -1,18 +1,27 @@
 %{
 #include <iostream>
+#include <cstdlib>
 #include <sstream>
-#include <vector>
+#include <map>
 #include <cassert>
 
 #define YYSTYPE atributos
 
 using namespace std;
 
-struct atributos
-{
+struct atributos{
+
     string label;
     string traducao;
 };
+
+typedef struct{
+
+    string type;
+    string tmp;
+}META_VAR;
+
+map<string, META_VAR> variable;
 
 string types[] = {"float", "int", "boolean", "char"};
 
@@ -28,7 +37,8 @@ void yyerror(string);
 
 bool validate_types(string type);
 string get_operation_type(string tp1, string tp2, string op);
-string current_variable();
+string current_temp();
+string set_variable(string var_name, string var_type = "");
 %}
 
 %token TK_NUM TK_REAL
@@ -93,20 +103,23 @@ E           : E '+' E
             | TK_ID
             {
                 $$.label = $1.label;
+                cout << set_variable($1.label) << endl;
             }
             | TK_ID '=' E
             {
                 $$.traducao = $3.traducao;
+                cout << set_variable($1.label) << endl;
             }
             /*Inserir Temps */
             | TK_TIPO_INT TK_ID
             {
                 $$.traducao = "\tint " + $2.label + ";\n";
+                cout << set_variable($2.label, "int") << endl;
             }
             | TK_TIPO_INT TK_ID '=' E
             {
                 $$.traducao = "\tint " + $4.traducao + "\n";
-
+                cout << set_variable($2.label, "int") << endl;
             }
             ;
 
@@ -171,7 +184,7 @@ string get_operation_type(string tp1, string tp2, string op){
 
 }
 
-string current_variable(){
+string current_temp(){
 
     static int var_number = 0;
 
@@ -180,4 +193,32 @@ string current_variable(){
     var_number++;
 
     return var;
+}
+
+string set_variable(string var_name, string var_type){
+
+    META_VAR var_aux;
+
+    if(variable.count(var_name) > 0){
+
+        var_aux = variable[var_name];
+
+        cout << variable.size() << endl;
+
+        return var_aux.tmp;
+    }
+    else{
+
+        //assert(var_type != "");
+        //assert(validate_types(var_type));
+
+        var_aux.type = var_type;
+        var_aux.tmp = current_temp();
+
+        variable.insert(pair<string, META_VAR>(var_name, var_aux));
+
+        cout << variable.size() << endl;
+
+        return var_aux.tmp;
+    }
 }

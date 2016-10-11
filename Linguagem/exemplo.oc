@@ -1,4 +1,17 @@
 int main()
 {
 	int a = 5;
+	int b = 7;
+	float c = 8;
+	float e;
+	float f;
+
+	b = 11;
+
+	c;
+
+	int d = 30;
+
+	a = 50;
+	f = 10;
 }
