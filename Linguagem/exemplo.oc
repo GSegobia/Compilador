@@ -2,9 +2,9 @@ int main()
 {
 	int a = 5;
 	int b = 7;
-	float c = 8;
-	float e;
-	float f;
+	int c = 8;
+	int e;
+	int f;
 
 	b = 11;
 
