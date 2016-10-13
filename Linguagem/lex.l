@@ -10,7 +10,7 @@ LETRA [A-Za-z_]
 DELIM {ESPACO}+
 NUM {DIGITO}+
 REAL {NUM}+("."{NUM}+)?
-CHAR \'({LETRA}|{NUM})\'
+CHAR \'({LETRA}|{DIGITO})\'
 ID {LETRA}({LETRA}|{NUM})*
 
 %%
@@ -21,9 +21,13 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "main"		{return TK_MAIN;}
 
-"int"		{return TK_TIPO_INT;}
+"int"		{yylval.traducao = yytext; return TK_TIPO;}
 
-"float"		{return TK_TIPO_FLOAT;}
+"float"		{yylval.traducao = yytext; return TK_TIPO;}
+
+"char"		{yylval.traducao = yytext; return TK_TIPO;}
+
+"bool"		{yylval.traducao = yytext; return TK_TIPO;}
 
 [(){}[\];,]	{ return *yytext; }
 
@@ -31,6 +35,7 @@ ID {LETRA}({LETRA}|{NUM})*
 
 {NUM}		{ yylval.traducao = yytext; return TK_NUM; }
 {REAL}		{ yylval.traducao = yytext; return TK_REAL; }
+{CHAR}      { yylval.traducao = yytext; return TK_CHAR; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
 .			{ *yytext; }
