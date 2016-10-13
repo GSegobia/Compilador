@@ -1,4 +1,10 @@
 int main()
 {
-	int a = 5;
+
+	int z = 7;
+	int j = 9;
+	int j = 18;
+	int j = 13;
+	int j = 10;
+
 }
