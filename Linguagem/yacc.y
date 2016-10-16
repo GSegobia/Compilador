@@ -41,7 +41,7 @@ string current_temp();
 string set_variable(string var_name, string var_type = "");
 %}
 
-%token TK_NUM TK_REAL TK_CHAR
+%token TK_NUM TK_REAL TK_CHAR TK_BOOL
 %token TK_MAIN TK_ID TK_TIPO
 %token TK_FIM TK_ERROR
 
@@ -55,7 +55,7 @@ string set_variable(string var_name, string var_type = "");
 
 S           : TK_TIPO TK_MAIN '(' ')' BLOCO
             {
-                cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl;
+                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl;
             }
             ;
 
@@ -68,65 +68,73 @@ BLOCO       : '{' COMANDOS '}'
 COMANDOS    : COMANDO COMANDOS
             {
                 $$.traducao = $1.traducao + $2.traducao;
+                cout << $1.traducao << '\t' << $2.traducao;
             }
             |
             ;
 
 COMANDO     : E ';'
+            {
+                $$.traducao = "\t" + $1.traducao + ";\n";
+            }
             ;
 
 E           : E '+' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b + c;\n";
+                $$.traducao = $1.traducao + " + " + $3.traducao;
             }
             | E '-' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b - c;\n";
+                $$.traducao = $1.traducao + " - " + $3.traducao;
             }
             | E '*' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b * c;\n";
+                $$.traducao = $1.traducao + " * " + $3.traducao;
             }
             | E '/' E
             {
-                $$.traducao = $1.traducao + $3.traducao + "\ta = b / c;\n";
+                $$.traducao = $1.traducao + " / " + $3.traducao;
             }
             | '(' E ')'
             {
-                $$.traducao = "\ta = (b);\n";
+                $$.traducao = "(" + $1.traducao + ")";
             }
             | TK_NUM
             {
-                $$.traducao = "\ta = " + $1.traducao + ";\n";
+                $$.traducao = $1.traducao;
             }
             | TK_REAL
             {
-                $$.traducao = "\ta = " + $1.traducao + ";\n";
+                $$.traducao = $1.traducao;
             }
             | TK_CHAR
             {
-                $$.traducao = "\ta = " + $1.traducao + ";\n";
+                $$.traducao = $1.traducao;
+            }
+            | TK_BOOL
+            {
+                string value = $1.traducao == "true" ? "1" : "0";
+                $$.traducao = value;
             }
             | TK_ID
             {
-                $$.label = $1.label;
-                cout << set_variable($1.label) << endl;
+                string variable_name = set_variable($1.label);
+                $$.label = variable_name;
             }
             | TK_ID '=' E
             {
-                $$.traducao = $3.traducao;
-                cout << set_variable($1.label) << endl;
+                string variable_name = set_variable($1.label);
+                $$.traducao = variable_name + " = " + $3.traducao;
             }
-            /*Inserir Temps */
             | TK_TIPO TK_ID
             {
-                $$.traducao = "\tint " + $2.label + ";\n";
-                cout << set_variable($2.label, $1.traducao) << endl;
+                string variable_name = set_variable($2.label, $1.traducao);
+                $$.traducao = $1.traducao + " " + variable_name;
             }
             | TK_TIPO TK_ID '=' E
             {
-                $$.traducao = "\tint " + $4.traducao + "\n";
-                cout << set_variable($2.label, $1.traducao) << endl;
+                string variable_name = set_variable($2.label, $1.traducao);
+                $$.traducao = $1.traducao + " " + variable_name + " = " + $4.traducao;
             }
             ;
 
@@ -210,8 +218,6 @@ string set_variable(string var_name, string var_type){
 
         var_aux = variable[var_name];
 
-        cout << variable[var_name].type << endl;
-
         return var_aux.tmp;
     }
     else{
@@ -223,8 +229,6 @@ string set_variable(string var_name, string var_type){
         var_aux.tmp = current_temp();
 
         variable.insert(pair<string, META_VAR>(var_name, var_aux));
-
-        cout << variable[var_name].type << endl;
 
         return var_aux.tmp;
     }

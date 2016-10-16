@@ -29,14 +29,18 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "bool"		{yylval.traducao = yytext; return TK_TIPO;}
 
+"true"      {yylval.traducao = yytext; return TK_BOOL;}
+
+"false"     {yylval.traducao = yytext; return TK_BOOL;}
+
 [(){}[\];,]	{ return *yytext; }
 
 [+\-*/=]	{ return *yytext; }
 
-{NUM}		{ yylval.traducao = yytext; return TK_NUM; }
-{REAL}		{ yylval.traducao = yytext; return TK_REAL; }
-{CHAR}      { yylval.traducao = yytext; return TK_CHAR; }
-{ID}		{ yylval.label = yytext; return TK_ID; }
+{NUM}		{yylval.traducao = yytext; return TK_NUM;}
+{REAL}		{yylval.traducao = yytext; return TK_REAL;}
+{CHAR}      {yylval.traducao = yytext; return TK_CHAR;}
+{ID}		{yylval.label = yytext; return TK_ID;}
 
 .			{ *yytext; }
 

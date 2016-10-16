@@ -4,11 +4,11 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 ##Sprint 1
 
 - [X] Expressão
-- [ ] Tipos (int, float, boolean, char)
+- [X] Tipos (int, float, boolean, char)
 - [ ] Conversão Implícita
 - [ ] Conversão Explícita
 - [ ] Operadores Lógicos (not, and, or)
 - [ ] Operadores Aritméticos (+, -, *, /, ^)
 - [ ] Operadores Relacionais (==, ===, !=, !==, <, >, <=, >=)
-- [ ] Variáveis
+- [X] Variáveis
 - [ ] Atribuições
