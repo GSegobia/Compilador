@@ -13,6 +13,7 @@ struct atributos{
 
     string label;
     string traducao;
+    string tipo;
 };
 
 typedef struct{
@@ -36,6 +37,7 @@ int yylex(void);
 void yyerror(string);
 
 bool validate_types(string type);
+void validate_attribute(string exp_type, string var_type);
 string verify_bool(string type);
 string get_operation_type(string tp1, string tp2, string op);
 string current_temp();
@@ -106,18 +108,22 @@ E           : E '+' E
             }
             | TK_NUM
             {
+                $$.tipo = "int";
                 $$.traducao = $1.traducao;
             }
             | TK_REAL
             {
+                $$.tipo = "float";
                 $$.traducao = $1.traducao;
             }
             | TK_CHAR
             {
+                $$.tipo = "char";
                 $$.traducao = $1.traducao;
             }
             | TK_BOOL
             {
+                $$.tipo = "bool";
                 string value = $1.traducao == "true" ? "1" : "0";
                 $$.traducao = value;
             }
@@ -129,6 +135,7 @@ E           : E '+' E
             | TK_ID '=' E
             {
                 string variable_name = set_variable($1.label);
+                validate_attribute($3.tipo, variable[$1.label].type);
                 $$.traducao = variable_name + " = " + $3.traducao;
             }
             | TK_TIPO TK_ID
@@ -138,7 +145,9 @@ E           : E '+' E
             }
             | TK_TIPO TK_ID '=' E
             {
+
                 string variable_name = set_variable($2.label, $1.traducao);
+                validate_attribute($4.tipo, variable[$2.label].type);
                 $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + $4.traducao;
             }
             ;
@@ -240,8 +249,14 @@ string set_variable(string var_name, string var_type){
 }
 
 string verify_bool(string type){
-  if(type=="bool")
-    return "int";
+    if(type=="bool")
+      return "int";
 
-  return type;
+    return type;
+}
+
+void validate_attribute(string exp_type, string var_type){
+    assert(exp_type == var_type);
+
+    return;
 }
