@@ -2,7 +2,7 @@ int main()
 {
 
 	int z = 7 + 15;
-	float f;
+	float f = false;
 	char e = 'T';
 	bool b = true;
 	bool c = false;

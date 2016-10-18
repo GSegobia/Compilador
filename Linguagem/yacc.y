@@ -36,6 +36,7 @@ int yylex(void);
 void yyerror(string);
 
 bool validate_types(string type);
+string verify_bool(string type);
 string get_operation_type(string tp1, string tp2, string op);
 string current_temp();
 string set_variable(string var_name, string var_type = "");
@@ -49,7 +50,7 @@ string set_variable(string var_name, string var_type = "");
 
 %left '+' '-'
 %left '*' '/'
-%left '^' '&'
+%left '^'
 %left '(' ')'
 
 %%
@@ -133,12 +134,12 @@ E           : E '+' E
             | TK_TIPO TK_ID
             {
                 string variable_name = set_variable($2.label, $1.traducao);
-                $$.traducao = $1.traducao + " " + variable_name;
+                $$.traducao = verify_bool($1.traducao) + " " + variable_name;
             }
             | TK_TIPO TK_ID '=' E
             {
                 string variable_name = set_variable($2.label, $1.traducao);
-                $$.traducao = $1.traducao + " " + variable_name + " = " + $4.traducao;
+                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + $4.traducao;
             }
             ;
 
@@ -236,4 +237,11 @@ string set_variable(string var_name, string var_type){
 
         return var_aux.tmp;
     }
+}
+
+string verify_bool(string type){
+  if(type=="bool")
+    return "int";
+
+  return type;
 }
