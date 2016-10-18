@@ -71,6 +71,9 @@ COMANDOS    : COMANDO COMANDOS
                 cout << $1.traducao << '\t' << $2.traducao;
             }
             |
+            {
+                $$.traducao = "";
+            }
             ;
 
 COMANDO     : E ';'
