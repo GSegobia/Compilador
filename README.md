@@ -8,7 +8,7 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 - [ ] Conversão Implícita
 - [ ] Conversão Explícita
 - [ ] Operadores Lógicos (not, and, or)
-- [ ] Operadores Aritméticos (+, -, *, /, ^)
-- [ ] Operadores Relacionais (==, ===, !=, !==, <, >, <=, >=)
+- [-] Operadores Aritméticos (+, -, *, /, ^)
+- [-] Operadores Relacionais (==, ===, !=, !==, <, >, <=, >=)
 - [X] Variáveis
-- [ ] Atribuições
+- [X] Atribuições

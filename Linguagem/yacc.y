@@ -14,6 +14,7 @@ struct atributos{
     string label;
     string traducao;
     string tipo;
+    string conversao;
 };
 
 typedef struct{
@@ -45,7 +46,7 @@ string set_variable(string var_name, string var_type = "");
 %}
 
 %token TK_NUM TK_REAL TK_CHAR TK_BOOL
-%token TK_MAIN TK_ID TK_TIPO
+%token TK_MAIN TK_ID TK_TIPO TK_RELAT
 %token TK_FIM TK_ERROR
 
 %start S
@@ -84,6 +85,29 @@ COMANDO     : E ';'
             {
                 $$.traducao = "\t" + $1.traducao + ";\n";
             }
+            | ATTR ';'
+            {
+                $$.traducao = "\t" + $1.traducao + ";\n";
+            }
+            ;
+
+ATTR        : TK_ID '=' E
+            {
+                string variable_name = set_variable($1.label);
+                validate_attribute($3.tipo, variable[$1.label].type);
+                $$.traducao = variable_name + " = " + $3.traducao;
+            }
+            | TK_TIPO TK_ID
+            {
+                string variable_name = set_variable($2.label, $1.traducao);
+                $$.traducao = verify_bool($1.traducao) + " " + variable_name;
+            }
+            | TK_TIPO TK_ID '=' E
+            {
+                string variable_name = set_variable($2.label, $1.traducao);
+                validate_attribute($4.tipo, variable[$2.label].type);
+                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + $4.traducao;
+            }
             ;
 
 E           : E '+' E
@@ -106,6 +130,10 @@ E           : E '+' E
             {
                 $$.traducao = "(" + $1.traducao + ")";
             }
+            | E TK_RELAT E
+            {
+                    $$.traducao = $1.traducao + " " + $2.traducao + " " + $3.traducao;
+            }
             | TK_NUM
             {
                 $$.tipo = "int";
@@ -127,28 +155,12 @@ E           : E '+' E
                 string value = $1.traducao == "true" ? "1" : "0";
                 $$.traducao = value;
             }
+            ;
             | TK_ID
             {
                 string variable_name = set_variable($1.label);
                 $$.label = variable_name;
-            }
-            | TK_ID '=' E
-            {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo, variable[$1.label].type);
-                $$.traducao = variable_name + " = " + $3.traducao;
-            }
-            | TK_TIPO TK_ID
-            {
-                string variable_name = set_variable($2.label, $1.traducao);
-                $$.traducao = verify_bool($1.traducao) + " " + variable_name;
-            }
-            | TK_TIPO TK_ID '=' E
-            {
-
-                string variable_name = set_variable($2.label, $1.traducao);
-                validate_attribute($4.tipo, variable[$2.label].type);
-                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + $4.traducao;
+                $$.traducao = variable_name;
             }
             ;
 
@@ -189,7 +201,7 @@ string get_operation_type(string tp1, string tp2, string op){
 
     string operation = "";
 
-    assert(validate_types(tp1) | validate_types(tp2));
+    assert(validate_types(tp1) || validate_types(tp2));
 
     if(tp1 == tp2){
 
@@ -199,9 +211,9 @@ string get_operation_type(string tp1, string tp2, string op){
 
         for(int i = 0; i < 4; i++){
 
-            if(tp1 == tabela_operadores[i][0] | tp1 == tabela_operadores[i][1])
+            if(tp1 == tabela_operadores[i][0] || tp1 == tabela_operadores[i][1])
 
-                if(tp2 == tabela_operadores[i][1] | tp2 == tabela_operadores[i][0])
+                if(tp2 == tabela_operadores[i][1] || tp2 == tabela_operadores[i][0])
 
                     if(op == tabela_operadores[i][2])
 
