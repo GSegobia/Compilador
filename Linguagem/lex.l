@@ -36,6 +36,9 @@ ID {LETRA}({LETRA}|{NUM})*
 ">"         {yylval.traducao = yytext; return TK_RELAT;}
 ">="        {yylval.traducao = yytext; return TK_RELAT;}
 
+"==="       {yylval.traducao = yytext; return TK_EQUALS_RELAT;}
+"!=="       {yylval.traducao = yytext; return TK_NOT_EQUALS_RELAT;}
+
 [(){}[\];,:]	{ return *yytext; }
 
 [+\-*/=]	{ return *yytext; }

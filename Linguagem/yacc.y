@@ -34,6 +34,13 @@ string tabela_operadores[][4] = {
                                     {"float", "int", "/", "float"}
                                 };
 
+map<string,string> type_value = {
+                                    {"float", "0"},
+                                    {"int", "1"},
+                                    {"bool", "2"},
+                                    {"char", "3"}
+                                };
+
 int yylex(void);
 void yyerror(string);
 
@@ -46,7 +53,7 @@ string set_variable(string var_name, string var_type = "");
 %}
 
 %token TK_NUM TK_REAL TK_CHAR TK_BOOL
-%token TK_MAIN TK_ID TK_TIPO TK_RELAT
+%token TK_MAIN TK_ID TK_TIPO TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
 %token TK_FIM TK_ERROR
 
 %start S
@@ -73,7 +80,6 @@ BLOCO       : '{' COMANDOS '}'
 COMANDOS    : COMANDO COMANDOS
             {
                 $$.traducao = $1.traducao + $2.traducao;
-                cout << $1.traducao << '\t' << $2.traducao;
             }
             |
             {
@@ -83,6 +89,7 @@ COMANDOS    : COMANDO COMANDOS
 
 COMANDO     : E ';'
             {
+                $$.tipo = $1.tipo;
                 $$.traducao = "\t" + $1.traducao + ";\n";
             }
             | ATTR ';'
@@ -112,27 +119,43 @@ ATTR        : TK_ID '=' E
 
 E           : E '+' E
             {
+                $$.tipo = get_operation_type($1.tipo, $3.tipo, "+");
                 $$.traducao = $1.traducao + " + " + $3.traducao;
             }
             | E '-' E
             {
+                $$.tipo = get_operation_type($1.tipo, $3.tipo, "-");
                 $$.traducao = $1.traducao + " - " + $3.traducao;
             }
             | E '*' E
             {
+                $$.tipo = get_operation_type($1.tipo, $3.tipo, "*");
                 $$.traducao = $1.traducao + " * " + $3.traducao;
             }
             | E '/' E
             {
+                $$.tipo = get_operation_type($1.tipo, $3.tipo, "/");
                 $$.traducao = $1.traducao + " / " + $3.traducao;
             }
             | '(' E ')'
             {
-                $$.traducao = "(" + $1.traducao + ")";
+                $$.tipo = $2.tipo;
+                $$.traducao = "(" + $2.traducao + ")";
             }
             | E TK_RELAT E
             {
-                    $$.traducao = $1.traducao + " " + $2.traducao + " " + $3.traducao;
+                $$.tipo = "bool";
+                $$.traducao = $1.traducao + " " + $2.traducao + " " + $3.traducao;
+            }
+            | E TK_NOT_EQUALS_RELAT E
+            {
+                $$.tipo = "bool";
+                $$.traducao = "(" + $1.traducao + " != " + $3.traducao + ") || (" + type_value[$1.tipo] + " != " + type_value[$3.tipo] + ")";
+            }
+            | E TK_EQUALS_RELAT E
+            {
+                $$.tipo = "bool";
+                $$.traducao = "(" + $1.traducao + " == " + $3.traducao + ") && (" + type_value[$1.tipo] + " == " + type_value[$3.tipo] + ")";
             }
             | TK_NUM
             {
@@ -155,9 +178,9 @@ E           : E '+' E
                 string value = $1.traducao == "true" ? "1" : "0";
                 $$.traducao = value;
             }
-            ;
             | TK_ID
             {
+                $$.tipo = variable[$1.label].type;
                 string variable_name = set_variable($1.label);
                 $$.label = variable_name;
                 $$.traducao = variable_name;
@@ -201,7 +224,9 @@ string get_operation_type(string tp1, string tp2, string op){
 
     string operation = "";
 
-    assert(validate_types(tp1) || validate_types(tp2));
+    assert(validate_types(tp1) && validate_types(tp2));
+    assert((tp1 != "char") && (tp1 != "bool"));
+    assert((tp2 != "char") && (tp2 != "bool"));
 
     if(tp1 == tp2){
 
@@ -221,8 +246,7 @@ string get_operation_type(string tp1, string tp2, string op){
         }
     }
 
-    return "ERROOOU";
-
+    assert(false);
 }
 
 string current_temp(){
