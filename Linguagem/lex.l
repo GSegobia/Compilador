@@ -36,6 +36,15 @@ ID {LETRA}({LETRA}|{NUM})*
 ">"         {yylval.traducao = yytext; return TK_RELAT;}
 ">="        {yylval.traducao = yytext; return TK_RELAT;}
 
+"+="		{yylval.traducao = yytext; return TK_PLUS_EQUAL;}
+"-="		{yylval.traducao = yytext; return TK_MINUS_EQUAL;}
+"*="		{yylval.traducao = yytext; return TK_MULTIPLIES_EQUAL;}
+"/="		{yylval.traducao = yytext; return TK_DIVIDES_EQUAL;}
+
+"and" 		{yylval.traducao = yytext; return TK_AND;}
+"or"		{yylval.traducao = yytext; return TK_OR;}
+"not"		{yylval.traducao = yytext; return TK_NOT;}	
+
 "==="       {yylval.traducao = yytext; return TK_EQUALS_RELAT;}
 "!=="       {yylval.traducao = yytext; return TK_NOT_EQUALS_RELAT;}
 

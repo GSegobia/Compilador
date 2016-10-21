@@ -18,4 +18,10 @@ int main()
 	bool c = false;
 	f = 23.7;
 	tmp_5 = 45;
+
+	char acs = 'a';
+
+	int acss = (int) f;
+
+
 }
