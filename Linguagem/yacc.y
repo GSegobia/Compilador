@@ -27,7 +27,7 @@ map<string, META_VAR> variable;
 
 string types[] = {"float", "int", "bool", "char"};
 
-string cast_table[][2] ={ 
+string cast_table[][2] ={
                         {"float","int"}
                         };
 
@@ -56,9 +56,11 @@ string current_temp();
 string set_variable(string var_name, string var_type = "");
 bool validate_cast(string tp1,string tip2);
 void validate_bool(string type);
+string implicit_cast(string var_type, string exp_type, string value);
+string implicit_cast_attr(string var_type, string exp_type, string value);
 %}
 
-%token TK_NUM TK_REAL TK_CHAR TK_BOOL 
+%token TK_NUM TK_REAL TK_CHAR TK_BOOL
 %token TK_OR TK_AND TK_NOT
 %token TK_MAIN TK_ID TK_TIPO TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 %token TK_FIM TK_ERROR
@@ -109,7 +111,7 @@ ATTR        : TK_ID '=' E
             {
                 string variable_name = set_variable($1.label);
                 validate_attribute($3.tipo, variable[$1.label].type);
-                $$.traducao = variable_name + " = " + $3.traducao;
+                $$.traducao = variable_name + " = " + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao);
             }
             | TK_TIPO TK_ID
             {
@@ -120,53 +122,53 @@ ATTR        : TK_ID '=' E
             {
                 string variable_name = set_variable($2.label, $1.traducao);
                 validate_attribute($4.tipo, variable[$2.label].type);
-                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + $4.traducao;
+                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + implicit_cast_attr($4.tipo, variable[$2.label].type, $4.traducao);
             }
             | TK_ID TK_PLUS_EQUAL E
             {
                 string variable_name = set_variable($1.label);
                 validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " + (" + $3.traducao + ")";
+                $$.traducao = variable_name + " = " + variable_name + " + (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
             }
             | TK_ID TK_MINUS_EQUAL E
             {
                 string variable_name = set_variable($1.label);
                 validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " - (" + $3.traducao + ")";
+                $$.traducao = variable_name + " = " + variable_name + " - (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
             }
             | TK_ID TK_MULTIPLIES_EQUAL E
             {
                 string variable_name = set_variable($1.label);
                 validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " * (" + $3.traducao + ")";
+                $$.traducao = variable_name + " = " + variable_name + " * (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
             }
             | TK_ID TK_DIVIDES_EQUAL E
             {
                 string variable_name = set_variable($1.label);
                 validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " / (" + $3.traducao + ")";
+                $$.traducao = variable_name + " = " + variable_name + " / (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
             }
             ;
 
 E           : E '+' E
             {
                 $$.tipo = get_operation_type($1.tipo, $3.tipo, "+");
-                $$.traducao = $1.traducao + " + " + $3.traducao;
+                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " + " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
             }
             | E '-' E
             {
                 $$.tipo = get_operation_type($1.tipo, $3.tipo, "-");
-                $$.traducao = $1.traducao + " - " + $3.traducao;
+                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " - " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
             }
             | E '*' E
             {
                 $$.tipo = get_operation_type($1.tipo, $3.tipo, "*");
-                $$.traducao = $1.traducao + " * " + $3.traducao;
+                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " * " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
             }
             | E '/' E
             {
                 $$.tipo = get_operation_type($1.tipo, $3.tipo, "/");
-                $$.traducao = $1.traducao + " / " + $3.traducao;
+                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " / " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
             }
             | '(' E ')'
             {
@@ -361,7 +363,9 @@ void validate_bool(string type){
 }
 
 void validate_attribute(string exp_type, string var_type){
-    assert(exp_type == var_type);
+
+    assert(exp_type == var_type || (exp_type != "char" && exp_type != "bool"));
+    assert(exp_type == var_type || (var_type != "char" && var_type != "bool"));
 
     return;
 }
@@ -386,4 +390,33 @@ bool validate_cast(string tp1,string tp2){
     }
 
     return false;
+}
+
+string implicit_cast(string var_type, string exp_type, string value){
+
+  assert(validate_types(var_type) && validate_types(exp_type));
+  assert((var_type != "char") && (var_type != "bool"));
+  assert((exp_type != "char") && (exp_type != "bool"));
+
+  if(var_type == exp_type)
+    return value;
+
+  return "((" + exp_type + ")" + value + ")";
+}
+
+string implicit_cast_attr(string var_type, string exp_type, string value){
+
+    assert(validate_types(var_type) && validate_types(exp_type));
+
+    if(var_type == exp_type){
+
+      return value;
+    }
+    else{
+
+      assert((var_type != "char") && (var_type != "bool"));
+      assert((exp_type != "char") && (exp_type != "bool"));
+    }
+
+    return "(" + exp_type + ")(" + value + ")";
 }

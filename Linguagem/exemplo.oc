@@ -1,11 +1,12 @@
 int main()
 {
 	int tmp_5 = 7 + 15;
-	float f = 5.0 + 3;
+	float f = 5.0 + 3 + 8;
+	float v = 1 + 9;
 	bool j = 5.0 === 5;
 	bool y = 5.0 !== 5;
 	bool w = (5.0 == 5);
-	bool u = (5.0 === 5) !== (3.0 == 3); 
+	bool u = (5.0 === 5) !== (3.0 == 3);
 	5 + 37;
 	f;
 	f + f;
