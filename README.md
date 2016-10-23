@@ -16,5 +16,5 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 
 ## Sprint 2
 
-- [] Correção de código intermediário para 3 endereços
-- [] Criação de operador de potência (^)
+- [ ] Correção de código intermediário para 3 endereços
+- [ ] Criação de operador de potência (^)
