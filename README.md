@@ -5,11 +5,16 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 
 - [X] Expressão
 - [X] Tipos (int, float, boolean, char)
-- [ ] Conversão Implícita
+- [X] Conversão Implícita
 - [x] Conversão Explícita
-- [x] Operadores Lógicos (not, and, or)
-- [x] Operadores Atribuição (+=,-=,*=,/=)
-- [x] Operadores Aritméticos (+, -, *, /, ^)
-- [x] Operadores Relacionais (==, ===, !=, !==, <, >, <=, >=)
+- [X] Operadores Lógicos (not, and, or)
+- [X] Operadores Atribuição (+=,-=,*=,/=)
+- [X] Operadores Aritméticos (+, -, *, /)
+- [X] Operadores Relacionais (==, ===, !=, !==, <, >, <=, >=)
 - [X] Variáveis
 - [X] Atribuições
+
+## Sprint 2
+
+- [] Correção de código intermediário para 3 endereços
+- [] Criação de operador de potência (^)
