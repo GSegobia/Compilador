@@ -1,4 +1,28 @@
 int main()
 {
-	a = b + c;
+	int tmp_5 = 7 + 15;
+	float f = 5.0 + 3 + 8;
+	float v = 1 + 9;
+	bool j = 5.0 === 5;
+	bool y = 5.0 !== 5;
+	bool w = (5.0 == 5);
+	bool u = (5.0 === 5) !== (3.0 == 3);
+	5 + 37;
+	f;
+	f + f;
+	char e = 'T';
+	bool a = true == false;
+	bool r = true != false;
+	bool h = true >= false;
+	bool n = true < false;
+	bool b = true;
+	bool c = false;
+	f = 23.7;
+	tmp_5 = 45;
+
+	char acs = 'a';
+
+	int acss = (int) f;
+
+
 }
