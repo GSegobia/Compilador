@@ -1,69 +1,31 @@
 %{
-#include <iostream>
-#include <cstdlib>
-#include <sstream>
-#include <map>
-#include <cassert>
+#include "functions.h"
 
-#define YYSTYPE atributos
+#define YYSTYPE attributes
 
 using namespace std;
 
-struct atributos{
+struct attributes{
 
     string label;
-    string traducao;
-    string tipo;
-    string conversao;
-};
-
-typedef struct{
-
     string type;
-    string tmp;
-}META_VAR;
-
-map<string, META_VAR> variable;
-
-string types[] = {"float", "int", "bool", "char"};
-
-string cast_table[][2] ={
-                        {"float","int"}
-                        };
-
-string tabela_operadores[][4] = {
-                                    {"float", "int", "+", "float"},
-                                    {"float", "int", "-", "float"},
-                                    {"float", "int", "*", "float"},
-                                    {"float", "int", "/", "float"}
-                                };
-
-map<string,string> type_value = {
-                                    {"float", "0"},
-                                    {"int", "1"},
-                                    {"bool", "2"},
-                                    {"char", "3"}
-                                };
+    string temp;
+    string attributions;
+    string translate;
+    string sentence;
+};
 
 int yylex(void);
 void yyerror(string);
 
-bool validate_types(string type);
-void validate_attribute(string exp_type, string var_type);
-string verify_bool(string type);
-string get_operation_type(string tp1, string tp2, string op);
-string current_temp();
-string set_variable(string var_name, string var_type = "");
-bool validate_cast(string tp1,string tip2);
-void validate_bool(string type);
-string implicit_cast(string var_type, string exp_type, string value);
-string implicit_cast_attr(string var_type, string exp_type, string value);
 %}
 
+%token TK_START TK_END
+%token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
 %token TK_NUM TK_REAL TK_CHAR TK_BOOL
 %token TK_OR TK_AND TK_NOT
-%token TK_MAIN TK_ID TK_TIPO TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
-%token TK_FIM TK_ERROR
+%token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
+%token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 
 %start S
 
@@ -74,180 +36,115 @@ string implicit_cast_attr(string var_type, string exp_type, string value);
 
 %%
 
-S           : TK_TIPO TK_MAIN '(' ')' BLOCO
+S           : TK_START BLOCK
             {
-                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao <<"\treturn 0;\n}" << endl;
+                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << $2.translate <<"\treturn 0;\n}" << endl;
             }
             ;
 
-BLOCO       : '{' COMANDOS '}'
+BLOCK       : ':' COMMANDS TK_END '\n'
             {
-                $$.traducao = $2.traducao;
+                $$.attributions = $2.attributions;
+                $$.translate = $2.translate;
             }
             ;
 
-COMANDOS    : COMANDO COMANDOS
+COMMANDS    : COMMAND COMMANDS
             {
-                $$.traducao = $1.traducao + $2.traducao;
+                $$.attributions = $1.attributions + $2.attributions;
+                $$.translate = $1.translate + $2.translate;
             }
             |
             {
-                $$.traducao = "";
+                $$.attributions = "";
+                $$.translate = "";
             }
             ;
 
-COMANDO     : E ';'
+COMMAND     : EXP '\n'
             {
-                $$.tipo = $1.tipo;
-                $$.traducao = "\t" + $1.traducao + ";\n";
+                $$.type = $1.type;
+                $$.translate = "\t" + $1.translate + ";\n";
             }
-            | ATTR ';'
+            | ATTR '\n'
             {
-                $$.traducao = "\t" + $1.traducao + ";\n";
+                $$.attributions = "\t" + $1.attributions + ";\n";
+                $$.translate = "\t" + $1.translate + ";\n";
             }
-            ;
-
-ATTR        : TK_ID '=' E
+            | '\n'
             {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo, variable[$1.label].type);
-                $$.traducao = variable_name + " = " + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao);
-            }
-            | TK_TIPO TK_ID
-            {
-                string variable_name = set_variable($2.label, $1.traducao);
-                $$.traducao = verify_bool($1.traducao) + " " + variable_name;
-            }
-            | TK_TIPO TK_ID '=' E
-            {
-                string variable_name = set_variable($2.label, $1.traducao);
-                validate_attribute($4.tipo, variable[$2.label].type);
-                $$.traducao = verify_bool($1.traducao) + " " + variable_name + " = " + implicit_cast_attr($4.tipo, variable[$2.label].type, $4.traducao);
-            }
-            | TK_ID TK_PLUS_EQUAL E
-            {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " + (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
-            }
-            | TK_ID TK_MINUS_EQUAL E
-            {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " - (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
-            }
-            | TK_ID TK_MULTIPLIES_EQUAL E
-            {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " * (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
-            }
-            | TK_ID TK_DIVIDES_EQUAL E
-            {
-                string variable_name = set_variable($1.label);
-                validate_attribute($3.tipo,variable[$1.label].type);
-                $$.traducao = variable_name + " = " + variable_name + " / (" + implicit_cast_attr($3.tipo, variable[$1.label].type, $3.traducao) + ")";
+                $$.attributions = "";
+                $$.translate = "";
             }
             ;
 
-E           : E '+' E
+ATTR        : TK_ID '=' EXP
             {
-                $$.tipo = get_operation_type($1.tipo, $3.tipo, "+");
-                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " + " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
+                $$.translate = "";
             }
-            | E '-' E
+            | TK_TYPE TK_ID
             {
-                $$.tipo = get_operation_type($1.tipo, $3.tipo, "-");
-                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " - " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
+                string var_aux = set_variable($2.label, $1.translate);
+
+                $$.type = get_type($1.translate);
+                $$.temp = var_aux;
+                $$.attributions = $$.type + " " + $$.temp;
+                $$.translate = "";
             }
-            | E '*' E
+            | TK_NUMBER TK_ID
             {
-                $$.tipo = get_operation_type($1.tipo, $3.tipo, "*");
-                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " * " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
+                $$.attributions = get_type($1.translate) + " " + set_variable($2.label, $1.translate);
+                $$.translate = "";
             }
-            | E '/' E
+            ;
+
+EXP         : EXP '+' EXP
             {
-                $$.tipo = get_operation_type($1.tipo, $3.tipo, "/");
-                $$.traducao = implicit_cast($1.tipo, $$.tipo, $1.traducao) + " / " + implicit_cast($3.tipo, $$.tipo, $3.traducao);
-            }
-            | '(' E ')'
-            {
-                $$.tipo = $2.tipo;
-                $$.traducao = "(" + $2.traducao + ")";
-            }
-            | '-' E
-            {
-                $$.tipo = $2.tipo;
-                $$.traducao = "-(" + $2.traducao + ")";
-            }
-            | E TK_RELAT E
-            {
-                $$.tipo = "bool";
-                $$.traducao = $1.traducao + " " + $2.traducao + " " + $3.traducao;
-            }
-            | E TK_NOT_EQUALS_RELAT E
-            {
-                $$.tipo = "bool";
-                $$.traducao = "(" + $1.traducao + " != " + $3.traducao + ") || (" + type_value[$1.tipo] + " != " + type_value[$3.tipo] + ")";
-            }
-            | E TK_EQUALS_RELAT E
-            {
-                $$.tipo = "bool";
-                $$.traducao = "(" + $1.traducao + " == " + $3.traducao + ") && (" + type_value[$1.tipo] + " == " + type_value[$3.tipo] + ")";
+                $$.type = get_operation_type($1.translate, $3.translate, "+");
+                $$.temp = set_variable(current_exp());
+                $$.attributions = $1.attributions + $3.attributions + ";\n\t";
+                $$.translate = define_translation($1.translate, $1.temp) + " + " + define_translation($3.translate, $3.temp);
+
             }
             | TK_NUM
             {
-                $$.tipo = "int";
-                $$.traducao = $1.traducao;
+                $$.type = "int";
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = $1.translate;
+                $$.sentence = "";
             }
             | TK_REAL
             {
-                $$.tipo = "float";
-                $$.traducao = $1.traducao;
+                $$.type = "float";
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = $1.translate;
+                $$.sentence = "";
             }
             | TK_CHAR
             {
-                $$.tipo = "char";
-                $$.traducao = $1.traducao;
+                $$.type = "char";
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = $1.translate;
+                $$.sentence = "";
             }
             | TK_BOOL
             {
-                $$.tipo = "bool";
-                string value = $1.traducao == "true" ? "1" : "0";
-                $$.traducao = value;
+                $$.type = "bool";
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = $1.translate;
+                $$.sentence = "";
             }
             | TK_ID
             {
-                $$.tipo = variable[$1.label].type;
-                string variable_name = set_variable($1.label);
-                $$.label = variable_name;
-                $$.traducao = variable_name;
-            }
-            | E TK_AND E
-            {
-                validate_bool($1.tipo);
-                validate_bool($3.tipo);
-                $$.tipo = "bool";
-                $$.traducao = $1.traducao + " && " + $3.traducao;
-            }
-            | E TK_OR E
-            {
-                validate_bool($1.tipo);
-                validate_bool($3.tipo);
-                $$.tipo = "bool";
-                $$.traducao = $1.traducao + " || " + $3.traducao;
-            }
-            | TK_NOT E
-            {
-                validate_bool($2.tipo);
-                $$.tipo = "bool";
-                $$.traducao = "!" + $2.traducao;
-            }
-            | '(' TK_TIPO ')' E
-            {
-                assert(validate_cast($2.traducao,$4.tipo));
-                $$.tipo = $2.traducao;
-                $$.traducao = "(" + $2.traducao + ")(" + $4.traducao + ")";
+                $$.type = get_variable_type($1.label);
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = get_variable_temp($1.label);
+                $$.sentence = "";
             }
             ;
 
@@ -265,158 +162,6 @@ int main(int argc, char* argv[]){
 }
 
 void yyerror(string MSG){
-
     cout << MSG << endl;
     exit (0);
-}
-
-bool validate_types(string type){
-
-    bool valid = false;
-
-    for(int i = 0; i < 4; i++){
-
-        if(type == types[i]){
-            valid = true;
-        }
-    }
-
-    return valid;
-}
-
-string get_operation_type(string tp1, string tp2, string op){
-
-    string operation = "";
-
-    assert(validate_types(tp1) && validate_types(tp2));
-    assert((tp1 != "char") && (tp1 != "bool"));
-    assert((tp2 != "char") && (tp2 != "bool"));
-
-    if(tp1 == tp2){
-
-        return tp1;
-    }
-    else{
-
-        for(int i = 0; i < 4; i++){
-
-            if(tp1 == tabela_operadores[i][0] || tp1 == tabela_operadores[i][1])
-
-                if(tp2 == tabela_operadores[i][1] || tp2 == tabela_operadores[i][0])
-
-                    if(op == tabela_operadores[i][2])
-
-                       return  tabela_operadores[i][3];
-        }
-    }
-
-    assert(false);
-}
-
-string current_temp(){
-
-    static int var_number = 0;
-
-    string var = "tmp_" + to_string(var_number);
-
-    var_number++;
-
-    return var;
-}
-
-string set_variable(string var_name, string var_type){
-
-    META_VAR var_aux;
-
-    if(variable.count(var_name) > 0){
-
-        var_aux = variable[var_name];
-
-        return var_aux.tmp;
-    }
-    else{
-
-        assert(var_type != "");
-        assert(validate_types(var_type));
-
-        var_aux.type = var_type;
-        var_aux.tmp = current_temp();
-
-        variable.insert(pair<string, META_VAR>(var_name, var_aux));
-
-        return var_aux.tmp;
-    }
-}
-
-string verify_bool(string type){
-
-    if(type=="bool")
-      return "int";
-
-    return type;
-}
-
-void validate_bool(string type){
-    assert(type == "bool");
-
-    return;
-}
-
-void validate_attribute(string exp_type, string var_type){
-
-    assert(exp_type == var_type || (exp_type != "char" && exp_type != "bool"));
-    assert(exp_type == var_type || (var_type != "char" && var_type != "bool"));
-
-    return;
-}
-
-bool validate_cast(string tp1,string tp2){
-
-    assert(validate_types(tp1) && validate_types(tp2));
-    assert((tp1 != "char") && (tp1 != "bool"));
-    assert((tp2 != "char") && (tp2 != "bool"));
-
-    if(tp1 == tp2){
-        return true;
-    }
-    else{
-
-        for(int i = 0; i < 1; i++){
-
-            if(tp1 == cast_table[i][0] || tp1 == cast_table[i][1])
-                if(tp2 == cast_table[i][1] || tp2 == cast_table[i][0])
-                    return true;
-        }
-    }
-
-    return false;
-}
-
-string implicit_cast(string var_type, string exp_type, string value){
-
-  assert(validate_types(var_type) && validate_types(exp_type));
-  assert((var_type != "char") && (var_type != "bool"));
-  assert((exp_type != "char") && (exp_type != "bool"));
-
-  if(var_type == exp_type)
-    return value;
-
-  return "((" + exp_type + ")" + value + ")";
-}
-
-string implicit_cast_attr(string var_type, string exp_type, string value){
-
-    assert(validate_types(var_type) && validate_types(exp_type));
-
-    if(var_type == exp_type){
-
-      return value;
-    }
-    else{
-
-      assert((var_type != "char") && (var_type != "bool"));
-      assert((exp_type != "char") && (exp_type != "bool"));
-    }
-
-    return "(" + exp_type + ")(" + value + ")";
 }
