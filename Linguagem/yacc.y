@@ -64,7 +64,8 @@ COMMANDS    : COMMAND COMMANDS
 COMMAND     : EXP '\n'
             {
                 $$.type = $1.type;
-                $$.translate = "\t" + $1.translate + ";\n";
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
             }
             | ATTR '\n'
             {
@@ -100,51 +101,46 @@ ATTR        : TK_ID '=' EXP
 
 EXP         : EXP '+' EXP
             {
-                $$.type = get_operation_type($1.translate, $3.translate, "+");
-                $$.temp = set_variable(current_exp());
-                $$.attributions = $1.attributions + $3.attributions + ";\n\t";
-                $$.translate = define_translation($1.translate, $1.temp) + " + " + define_translation($3.translate, $3.temp);
+                $$.type = "int";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " + " + $3.temp + ";\n";
 
             }
             | TK_NUM
             {
                 $$.type = "int";
-                $$.temp = "";
-                $$.attributions = "";
-                $$.translate = $1.translate;
-                $$.sentence = "";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
             }
             | TK_REAL
             {
                 $$.type = "float";
-                $$.temp = "";
-                $$.attributions = "";
-                $$.translate = $1.translate;
-                $$.sentence = "";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
             }
             | TK_CHAR
             {
                 $$.type = "char";
-                $$.temp = "";
-                $$.attributions = "";
-                $$.translate = $1.translate;
-                $$.sentence = "";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
             }
             | TK_BOOL
             {
                 $$.type = "bool";
-                $$.temp = "";
-                $$.attributions = "";
-                $$.translate = $1.translate;
-                $$.sentence = "";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
             }
             | TK_ID
             {
                 $$.type = get_variable_type($1.label);
-                $$.temp = "";
+                $$.temp = get_variable_temp($1.label);
                 $$.attributions = "";
-                $$.translate = get_variable_temp($1.label);
-                $$.sentence = "";
+                $$.translate = "";
             }
             ;
 

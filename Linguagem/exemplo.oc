@@ -1,6 +1,6 @@
 start:
-	bool f
-	number o
-	char a
-	char b
+	5 + 7
+	4
+	3 + 4
+	3 + 4 + 7
 end

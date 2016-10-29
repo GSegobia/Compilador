@@ -44,14 +44,6 @@ string current_temp(){
     return var;
 }
 
-string define_translation(string translate, string temp){
-
-    if(temp == "")
-        return translate;
-
-    return temp;
-}
-
 string set_variable(string var_name, string var_type = ""){
 
     META_VAR var_aux;
