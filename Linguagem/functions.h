@@ -120,7 +120,7 @@ string get_operation_type(string type1, string type2, string op){
 
     if(type == ""){
 
-        cout << "Expression type can not be resolved." << endl;
+        cout << "Type \'" << type1 << "\' can not \'" << op << "\' type \'" << type2 << "\'." << endl;
         exit(EXIT_FAILURE);
     }
 
