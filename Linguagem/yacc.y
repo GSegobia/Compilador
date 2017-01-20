@@ -124,6 +124,13 @@ EXP         : EXP '+' EXP
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " + " + $3.temp + ";\n";
 
             }
+            | EXP '-' EXP
+            {
+                $$.type = get_operation_type($1.type, $3.type, "-");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " - " + $3.temp + ";\n";
+            }
             | TK_NUM
             {
                 $$.type = "int";
