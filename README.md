@@ -8,33 +8,33 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [x] Atribuições
 
   ### Tipos
-    - [x] number (int e float)
-    - [x] boolean
-    - [x] char
+  - [x] number (int e float)
+  - [x] boolean
+  - [x] char
 
   ### Conversão
-    - [ ] Implícita
-    - [ ] Explícita
+  - [ ] Implícita
+  - [ ] Explícita
 
   ### Operadores Lógicos
-    - [ ] not
-    - [ ] or
-    - [ ] and
+  - [ ] not
+  - [ ] or
+  - [ ] and
 
   ### Operadores Aritméticos
-    - [x] + (Soma)
-    - [x] - (Subtração)
-    - [ ] * (Multiplicação)
-    - [ ] / (Divisão)
-    - [ ] % (Módulo)
+  - [x] + (Soma)
+  - [x] - (Subtração)
+  - [ ] * (Multiplicação)
+  - [ ] / (Divisão)
+  - [ ] % (Módulo)
 
   ### Operadores Relacionais
-    - [ ] == (Igualdade)
-    - [ ] != (Diferença)
-    - [ ] < (Menor que)
-    - [ ] > (Maior que)
-    - [ ] <= (Menor ou Igual)
-    - [ ] >= (Maior ou Igual)
+  - [ ] == (Igualdade)
+  - [ ] != (Diferença)
+  - [ ] < (Menor que)
+  - [ ] > (Maior que)
+  - [ ] <= (Menor ou Igual)
+  - [ ] >= (Maior ou Igual)
 
 ## Entrega 2
 
@@ -45,16 +45,16 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [ ] Comandos de Entrada e Saída
 
   ### Comandos
-    - [ ] if
-    - [ ] if/else
-    - [ ] while
-    - [ ] do/while
-    - [ ] for
-    - [ ] switch
+  - [ ] if
+  - [ ] if/else
+  - [ ] while
+  - [ ] do/while
+  - [ ] for
+  - [ ] switch
 
   ### Controle de Laços
-    - [ ] break
-    - [ ] continue
+  - [ ] break
+  - [ ] continue
 
 ## Entrega 3
 
@@ -72,25 +72,25 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [ ] auto (Vinculação Dinâmica de Tipo)
 
   ### Operadores Lógicos
-    - [ ] xor
-    - [ ] nand
-    - [ ] & (and bitwise)
-    - [ ] | (or bitwise)
+  - [ ] xor
+  - [ ] nand
+  - [ ] & (and bitwise)
+  - [ ] | (or bitwise)
 
   ### Operadores Aritméticos
-    - [ ] \*\* (Potenciação)
-    - [ ] // (Radiciação)
+  - [ ] \*\* (Potenciação)
+  - [ ] // (Radiciação)
 
   ### Operadores Compostos
-    - [ ] += (Atribuição por Soma)
-    - [ ] -= (Atribuição por Subtração)
-    - [ ] \*= (Atribuição por Multiplicação)
-    - [ ] /= (Atribuição por Divisão)
+  - [ ] += (Atribuição por Soma)
+  - [ ] -= (Atribuição por Subtração)
+  - [ ] \*= (Atribuição por Multiplicação)
+  - [ ] /= (Atribuição por Divisão)
 
   ### Operadores Relacionais
-    - [ ] === (Igualdade de Valor e Tipo)
-    - [ ] !== (Diferença de Valor ou Tipo)
+  - [ ] === (Igualdade de Valor e Tipo)
+  - [ ] !== (Diferença de Valor ou Tipo)
 
   ### Comandos
-    - [ ] foreach
-    - [ ] Ternário (if?true:false)
+  - [ ] foreach
+  - [ ] Ternário (if?true:false)
