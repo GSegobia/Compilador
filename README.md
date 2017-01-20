@@ -94,3 +94,9 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   ### Comandos
   - [ ] foreach
   - [ ] Ternário (if?true:false)
+
+## To-do
+
+ - [ ] Alinhamento Sintaxe da Linguagem
+ - [ ] Alinhamento Features Importantes
+ - [ ] Criação de Arquivo .cpp com Código Intermediário
