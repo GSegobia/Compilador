@@ -96,6 +96,26 @@ string verify_bool(string type){
     return type;
 }
 
+string boolean_operation(string type1, string type2, string op){
+
+  validate_type(type1);
+  validate_type(type2);
+
+  if(type1 == "bool" and type2 == "bool")
+    return "int";
+
+  cout << "Type \'" << type1 << "\' can not \'" << op << "\' type \'" << type2 << "\'." << endl;
+  exit(EXIT_FAILURE);
+}
+
+string boolean_value(string value){
+
+  if(value == "true")
+    return "1";
+
+  return "0";
+}
+
 string get_operation_type(string type1, string type2, string op){
 
     validate_type(type1);

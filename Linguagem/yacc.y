@@ -83,14 +83,14 @@ ATTR        : TK_TYPE TK_ID
             {
                 $$.type = $1.translate;
                 $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = verify_bool($$.type) + " " + $$.temp;
+                $$.attributions = '\t' + verify_bool($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "";
             }
             | TK_NUMBER TK_ID
             {
                 $$.type = get_type($1.translate);
                 $$.temp = set_variable($2.label, $$.type);
-                $$.attributions = $$.type + " " + $$.temp;
+                $$.attributions = '\t' + $$.type + " " + $$.temp + ";\n";
                 $$.translate = "";
             }
             | TK_TYPE TK_ID '=' EXP
@@ -131,6 +131,20 @@ EXP         : EXP '+' EXP
                 $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " - " + $3.temp + ";\n";
             }
+            | EXP TK_OR EXP
+            {
+              $$.type = boolean_operation($1.type, $3.type, $$.translate);
+              $$.temp = set_variable(current_exp(), $$.type);
+              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " || " + $3.temp + ";\n";
+            }
+            | EXP TK_AND EXP
+            {
+              $$.type = boolean_operation($1.type, $3.type, $$.translate);
+              $$.temp = set_variable(current_exp(), $$.type);
+              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " && " + $3.temp + ";\n";
+            }
             | TK_NUM
             {
                 $$.type = "int";
@@ -155,9 +169,9 @@ EXP         : EXP '+' EXP
             | TK_BOOL
             {
                 $$.type = "bool";
-                $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
-                $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
+                $$.temp = set_variable(current_exp(), verify_bool($$.type));
+                $$.attributions = "\t" + verify_bool($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + boolean_value($1.translate) + ";\n";
             }
             | TK_ID
             {
