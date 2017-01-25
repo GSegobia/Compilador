@@ -116,10 +116,16 @@ string boolean_value(string value){
   return "0";
 }
 
+//Corrigir essa função
 string get_operation_type(string type1, string type2, string op){
 
     validate_type(type1);
     validate_type(type2);
+
+    if(type1 == type2)
+      return type1;
+
+
 
     string type = "";
 

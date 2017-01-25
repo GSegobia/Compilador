@@ -2,5 +2,5 @@ start:
 	bool a = true or false
 	bool b = true and false
 
-	bool c = a or b and a
+	bool c  = a or b and a
 end

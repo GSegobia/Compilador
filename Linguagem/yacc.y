@@ -131,18 +131,39 @@ EXP         : EXP '+' EXP
                 $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " - " + $3.temp + ";\n";
             }
+            | EXP '*' EXP
+            {
+                $$.type = get_operation_type($1.type, $3.type, "*");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " * " + $3.temp + ";\n";
+            }
+            | EXP '/' EXP
+            {
+                $$.type = get_operation_type($1.type, $3.type, "/");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
+            }
+            /*| '|' EXP '|'
+            {
+                $$.type = get_operation_type($2.type, "-");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $2.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $2.translate + "\t" + $$.temp + " = " + " | " + $2.temp + " | " + ";\n";
+            }*/
             | EXP TK_OR EXP
             {
-              $$.type = boolean_operation($1.type, $3.type, $$.translate);
+              $$.type = "bool";
               $$.temp = set_variable(current_exp(), $$.type);
-              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.attributions = $1.attributions + $3.attributions + "\t" + verify_bool($$.type) + " " + $$.temp + ";\n";
               $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " || " + $3.temp + ";\n";
             }
             | EXP TK_AND EXP
             {
-              $$.type = boolean_operation($1.type, $3.type, $$.translate);
+              $$.type = "bool";
               $$.temp = set_variable(current_exp(), $$.type);
-              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.attributions = $1.attributions + $3.attributions + "\t" + verify_bool($$.type) + " " + $$.temp + ";\n";
               $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " && " + $3.temp + ";\n";
             }
             | TK_NUM
