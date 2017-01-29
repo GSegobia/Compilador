@@ -145,6 +145,13 @@ EXP         : EXP '+' EXP
                 $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
             }
+            | EXP TK_RELAT EXP
+            {
+              $$.type = "bool";
+              $$.temp = set_variable(current_exp(), $$.type);
+              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " " + $2.translate + " " + $3.temp + ";\n";
+            }
             /*| '|' EXP '|'
             {
                 $$.type = get_operation_type($2.type, "-");
