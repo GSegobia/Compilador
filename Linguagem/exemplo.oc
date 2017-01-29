@@ -1,6 +1,7 @@
 start:
-	bool a = true or false
-	bool b = true and false
+	number a = 2
+	number b = 5
+	number c = 4
 
-	bool c  = a or b and a
+	b = a + b
 end

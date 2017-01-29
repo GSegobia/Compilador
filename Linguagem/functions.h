@@ -13,7 +13,7 @@ bool validate_type(string type){
 }
 
 string get_type(string type){
-
+  
     validate_type(type);
 
     if(type == "number")
@@ -62,6 +62,7 @@ string set_variable(string var_name, string var_type = ""){
     return var_aux.tmp;
 }
 
+//código antigo, é usada a get_type atualmente
 string get_variable_type(string var_name){
 
     if(variable.count(var_name) == 0){

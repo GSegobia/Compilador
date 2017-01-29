@@ -57,7 +57,7 @@ ID {LETTER}({LETTER}|{NUM})*
 
 "\n"		{return *yytext;}
 
-[+\-*/=]	{return *yytext;}
+[+\-*/=%]	{return *yytext;}
 
 {NUM}		{yylval.translate = yytext; return TK_NUM;}
 {FLOAT}		{yylval.translate = yytext; return TK_REAL;}

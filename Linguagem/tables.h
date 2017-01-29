@@ -4,7 +4,7 @@
 #include <map>
 #include <cassert>
 
-#define OPERATORS 4
+#define OPERATORS 5
 #define CAST 2
 #define TYPES 5
 
@@ -28,7 +28,8 @@ string op_table[][OPERATORS] = {
                                     {"float", "int", "+", "float"},
                                     {"float", "int", "-", "float"},
                                     {"float", "int", "*", "float"},
-                                    {"float", "int", "/", "float"}
+                                    {"float", "int", "/", "float"},
+                                    {"float", "int", "%", "float"}
                                 };
 
 map<string,string> type_value = {

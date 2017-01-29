@@ -30,7 +30,7 @@ void yyerror(string);
 %start S
 
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %left '^'
 %left '(' ')'
 
@@ -38,7 +38,7 @@ void yyerror(string);
 
 S           : TK_START BLOCK
             {
-                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << $2.translate <<"\treturn 0;\n}" << endl;
+                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << "\n---- FIM DAS ATRIBUIÇÕES ----\n \n"<< $2.translate <<"\n \treturn 0;\n}" << endl;
             }
             ;
 
@@ -103,14 +103,14 @@ ATTR        : TK_TYPE TK_ID
             | TK_NUMBER TK_ID '=' EXP
             {
                 $$.type = get_type($1.translate);
-                $$.temp = set_variable($2.label, $1.translate);
+                $$.temp = set_variable($2.label, $$.type);
                 $$.attributions = $4.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
                 $$.translate = $4.translate + '\t' + $$.temp + " = " + $4.temp + ";\n";
             }
             | TK_ID '=' EXP
             {
-                $$.type = get_variable_type($1.translate);
-                $$.temp = get_variable_temp($1.translate);
+                $$.type = get_type($1.translate);
+                $$.temp = get_variable_temp($1.label);
                 $$.attributions = $3.attributions;
                 $$.translate = $3.translate + '\t' + $$.temp + " = " + $3.temp + ";\n";
             }
@@ -144,6 +144,13 @@ EXP         : EXP '+' EXP
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
+            }
+            | EXP '%' EXP
+            {
+                $$.type = get_operation_type($1.type, $3.type, "%");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " % " + $3.temp + ";\n";
             }
             | EXP TK_RELAT EXP
             {
