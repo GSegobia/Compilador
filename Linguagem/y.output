@@ -3,7 +3,6 @@ Terminals unused in grammar
    TK_DYNAMIC_TYPE
    TK_NUMBER_TYPE
    TK_NOT
-   TK_RELAT
    TK_NOT_EQUALS_RELAT
    TK_EQUALS_RELAT
    TK_PLUS_EQUAL
@@ -15,12 +14,14 @@ Terminals unused in grammar
    ')'
 
 
-State 35 conflicts: 6 shift/reduce
-State 36 conflicts: 6 shift/reduce
-State 37 conflicts: 2 shift/reduce
-State 38 conflicts: 2 shift/reduce
-State 39 conflicts: 2 shift/reduce
-State 40 conflicts: 2 shift/reduce
+State 37 conflicts: 8 shift/reduce
+State 38 conflicts: 8 shift/reduce
+State 39 conflicts: 8 shift/reduce
+State 40 conflicts: 3 shift/reduce
+State 41 conflicts: 3 shift/reduce
+State 42 conflicts: 3 shift/reduce
+State 43 conflicts: 3 shift/reduce
+State 44 conflicts: 3 shift/reduce
 
 
 Grammar
@@ -48,18 +49,21 @@ Grammar
    14    | EXP '-' EXP
    15    | EXP '*' EXP
    16    | EXP '/' EXP
-   17    | EXP TK_OR EXP
-   18    | EXP TK_AND EXP
-   19    | TK_REAL
-   20    | TK_CHAR
-   21    | TK_BOOL
-   22    | TK_ID
+   17    | EXP '%' EXP
+   18    | EXP TK_RELAT EXP
+   19    | EXP TK_OR EXP
+   20    | EXP TK_AND EXP
+   21    | TK_REAL
+   22    | TK_CHAR
+   23    | TK_BOOL
+   24    | TK_ID
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 '\n' (10) 2 5 6 7
+'%' (37) 17
 '(' (40)
 ')' (41)
 '*' (42) 15
@@ -76,14 +80,14 @@ TK_TYPE (260) 8 10
 TK_DYNAMIC_TYPE (261)
 TK_NUMBER (262) 9 11
 TK_NUMBER_TYPE (263)
-TK_ID (264) 8 9 10 11 12 22
-TK_REAL (265) 19
-TK_CHAR (266) 20
-TK_BOOL (267) 21
-TK_OR (268) 17
-TK_AND (269) 18
+TK_ID (264) 8 9 10 11 12 24
+TK_REAL (265) 21
+TK_CHAR (266) 22
+TK_BOOL (267) 23
+TK_OR (268) 19
+TK_AND (269) 20
 TK_NOT (270)
-TK_RELAT (271)
+TK_RELAT (271) 18
 TK_NOT_EQUALS_RELAT (272)
 TK_EQUALS_RELAT (273)
 TK_PLUS_EQUAL (274)
@@ -94,21 +98,21 @@ TK_DIVIDES_EQUAL (277)
 
 Nonterminals, with rules where they appear
 
-$accept (33)
+$accept (34)
     on left: 0
-S (34)
+S (35)
     on left: 1, on right: 0
-BLOCK (35)
+BLOCK (36)
     on left: 2, on right: 1
-COMMANDS (36)
+COMMANDS (37)
     on left: 3 4, on right: 2 3
-COMMAND (37)
+COMMAND (38)
     on left: 5 6 7, on right: 3
-ATTR (38)
+ATTR (39)
     on left: 8 9 10 11 12, on right: 6
-EXP (39)
-    on left: 13 14 15 16 17 18 19 20 21 22, on right: 5 10 11 12 13
-    14 15 16 17 18
+EXP (40)
+    on left: 13 14 15 16 17 18 19 20 21 22 23 24, on right: 5 10 11
+    12 13 14 15 16 17 18 19 20
 
 
 State 0
@@ -189,32 +193,32 @@ State 7
 State 8
 
    12 ATTR: TK_ID . '=' EXP
-   22 EXP: TK_ID .
+   24 EXP: TK_ID .
 
     '='  shift, and go to state 19
 
-    $default  reduce using rule 22 (EXP)
+    $default  reduce using rule 24 (EXP)
 
 
 State 9
 
-   19 EXP: TK_REAL .
+   21 EXP: TK_REAL .
 
-    $default  reduce using rule 19 (EXP)
+    $default  reduce using rule 21 (EXP)
 
 
 State 10
 
-   20 EXP: TK_CHAR .
+   22 EXP: TK_CHAR .
 
-    $default  reduce using rule 20 (EXP)
+    $default  reduce using rule 22 (EXP)
 
 
 State 11
 
-   21 EXP: TK_BOOL .
+   23 EXP: TK_BOOL .
 
-    $default  reduce using rule 21 (EXP)
+    $default  reduce using rule 23 (EXP)
 
 
 State 12
@@ -265,16 +269,20 @@ State 16
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
-    '\n'    shift, and go to state 29
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
+    '\n'      shift, and go to state 31
 
 
 State 17
@@ -282,7 +290,7 @@ State 17
     8 ATTR: TK_TYPE TK_ID .
    10     | TK_TYPE TK_ID . '=' EXP
 
-    '='  shift, and go to state 30
+    '='  shift, and go to state 32
 
     $default  reduce using rule 8 (ATTR)
 
@@ -292,7 +300,7 @@ State 18
     9 ATTR: TK_NUMBER TK_ID .
    11     | TK_NUMBER TK_ID . '=' EXP
 
-    '='  shift, and go to state 31
+    '='  shift, and go to state 33
 
     $default  reduce using rule 9 (ATTR)
 
@@ -301,19 +309,19 @@ State 19
 
    12 ATTR: TK_ID '=' . EXP
 
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
 
-    EXP  go to state 33
+    EXP  go to state 35
 
 
 State 20
 
     2 BLOCK: ':' COMMANDS TK_END . '\n'
 
-    '\n'  shift, and go to state 34
+    '\n'  shift, and go to state 36
 
 
 State 21
@@ -332,33 +340,9 @@ State 22
 
 State 23
 
-   17 EXP: EXP TK_OR . EXP
+   19 EXP: EXP TK_OR . EXP
 
-    TK_ID    shift, and go to state 32
-    TK_REAL  shift, and go to state 9
-    TK_CHAR  shift, and go to state 10
-    TK_BOOL  shift, and go to state 11
-
-    EXP  go to state 35
-
-
-State 24
-
-   18 EXP: EXP TK_AND . EXP
-
-    TK_ID    shift, and go to state 32
-    TK_REAL  shift, and go to state 9
-    TK_CHAR  shift, and go to state 10
-    TK_BOOL  shift, and go to state 11
-
-    EXP  go to state 36
-
-
-State 25
-
-   13 EXP: EXP '+' . EXP
-
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -366,11 +350,11 @@ State 25
     EXP  go to state 37
 
 
-State 26
+State 24
 
-   14 EXP: EXP '-' . EXP
+   20 EXP: EXP TK_AND . EXP
 
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -378,11 +362,11 @@ State 26
     EXP  go to state 38
 
 
-State 27
+State 25
 
-   15 EXP: EXP '*' . EXP
+   18 EXP: EXP TK_RELAT . EXP
 
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -390,11 +374,11 @@ State 27
     EXP  go to state 39
 
 
-State 28
+State 26
 
-   16 EXP: EXP '/' . EXP
+   13 EXP: EXP '+' . EXP
 
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -402,18 +386,11 @@ State 28
     EXP  go to state 40
 
 
-State 29
+State 27
 
-    5 COMMAND: EXP '\n' .
+   14 EXP: EXP '-' . EXP
 
-    $default  reduce using rule 5 (COMMAND)
-
-
-State 30
-
-   10 ATTR: TK_TYPE TK_ID '=' . EXP
-
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -421,11 +398,11 @@ State 30
     EXP  go to state 41
 
 
-State 31
+State 28
 
-   11 ATTR: TK_NUMBER TK_ID '=' . EXP
+   15 EXP: EXP '*' . EXP
 
-    TK_ID    shift, and go to state 32
+    TK_ID    shift, and go to state 34
     TK_REAL  shift, and go to state 9
     TK_CHAR  shift, and go to state 10
     TK_BOOL  shift, and go to state 11
@@ -433,130 +410,161 @@ State 31
     EXP  go to state 42
 
 
+State 29
+
+   16 EXP: EXP '/' . EXP
+
+    TK_ID    shift, and go to state 34
+    TK_REAL  shift, and go to state 9
+    TK_CHAR  shift, and go to state 10
+    TK_BOOL  shift, and go to state 11
+
+    EXP  go to state 43
+
+
+State 30
+
+   17 EXP: EXP '%' . EXP
+
+    TK_ID    shift, and go to state 34
+    TK_REAL  shift, and go to state 9
+    TK_CHAR  shift, and go to state 10
+    TK_BOOL  shift, and go to state 11
+
+    EXP  go to state 44
+
+
+State 31
+
+    5 COMMAND: EXP '\n' .
+
+    $default  reduce using rule 5 (COMMAND)
+
+
 State 32
 
-   22 EXP: TK_ID .
+   10 ATTR: TK_TYPE TK_ID '=' . EXP
 
-    $default  reduce using rule 22 (EXP)
+    TK_ID    shift, and go to state 34
+    TK_REAL  shift, and go to state 9
+    TK_CHAR  shift, and go to state 10
+    TK_BOOL  shift, and go to state 11
+
+    EXP  go to state 45
 
 
 State 33
+
+   11 ATTR: TK_NUMBER TK_ID '=' . EXP
+
+    TK_ID    shift, and go to state 34
+    TK_REAL  shift, and go to state 9
+    TK_CHAR  shift, and go to state 10
+    TK_BOOL  shift, and go to state 11
+
+    EXP  go to state 46
+
+
+State 34
+
+   24 EXP: TK_ID .
+
+    $default  reduce using rule 24 (EXP)
+
+
+State 35
 
    12 ATTR: TK_ID '=' EXP .
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
     $default  reduce using rule 12 (ATTR)
 
 
-State 34
+State 36
 
     2 BLOCK: ':' COMMANDS TK_END '\n' .
 
     $default  reduce using rule 2 (BLOCK)
 
 
-State 35
-
-   13 EXP: EXP . '+' EXP
-   14    | EXP . '-' EXP
-   15    | EXP . '*' EXP
-   16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   17    | EXP TK_OR EXP .
-   18    | EXP . TK_AND EXP
-
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
-
-    TK_OR     [reduce using rule 17 (EXP)]
-    TK_AND    [reduce using rule 17 (EXP)]
-    '+'       [reduce using rule 17 (EXP)]
-    '-'       [reduce using rule 17 (EXP)]
-    '*'       [reduce using rule 17 (EXP)]
-    '/'       [reduce using rule 17 (EXP)]
-    $default  reduce using rule 17 (EXP)
-
-
-State 36
-
-   13 EXP: EXP . '+' EXP
-   14    | EXP . '-' EXP
-   15    | EXP . '*' EXP
-   16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
-   18    | EXP TK_AND EXP .
-
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
-
-    TK_OR     [reduce using rule 18 (EXP)]
-    TK_AND    [reduce using rule 18 (EXP)]
-    '+'       [reduce using rule 18 (EXP)]
-    '-'       [reduce using rule 18 (EXP)]
-    '*'       [reduce using rule 18 (EXP)]
-    '/'       [reduce using rule 18 (EXP)]
-    $default  reduce using rule 18 (EXP)
-
-
 State 37
 
    13 EXP: EXP . '+' EXP
-   13    | EXP '+' EXP .
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   19    | EXP TK_OR EXP .
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
-    TK_OR     [reduce using rule 13 (EXP)]
-    TK_AND    [reduce using rule 13 (EXP)]
-    $default  reduce using rule 13 (EXP)
+    TK_OR     [reduce using rule 19 (EXP)]
+    TK_AND    [reduce using rule 19 (EXP)]
+    TK_RELAT  [reduce using rule 19 (EXP)]
+    '+'       [reduce using rule 19 (EXP)]
+    '-'       [reduce using rule 19 (EXP)]
+    '*'       [reduce using rule 19 (EXP)]
+    '/'       [reduce using rule 19 (EXP)]
+    '%'       [reduce using rule 19 (EXP)]
+    $default  reduce using rule 19 (EXP)
 
 
 State 38
 
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
-   14    | EXP '-' EXP .
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
+   20    | EXP TK_AND EXP .
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
-    TK_OR     [reduce using rule 14 (EXP)]
-    TK_AND    [reduce using rule 14 (EXP)]
-    $default  reduce using rule 14 (EXP)
+    TK_OR     [reduce using rule 20 (EXP)]
+    TK_AND    [reduce using rule 20 (EXP)]
+    TK_RELAT  [reduce using rule 20 (EXP)]
+    '+'       [reduce using rule 20 (EXP)]
+    '-'       [reduce using rule 20 (EXP)]
+    '*'       [reduce using rule 20 (EXP)]
+    '/'       [reduce using rule 20 (EXP)]
+    '%'       [reduce using rule 20 (EXP)]
+    $default  reduce using rule 20 (EXP)
 
 
 State 39
@@ -564,72 +572,192 @@ State 39
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
-   15    | EXP '*' EXP .
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   18    | EXP TK_RELAT EXP .
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
-    TK_OR     [reduce using rule 15 (EXP)]
-    TK_AND    [reduce using rule 15 (EXP)]
-    $default  reduce using rule 15 (EXP)
+    TK_OR     [reduce using rule 18 (EXP)]
+    TK_AND    [reduce using rule 18 (EXP)]
+    TK_RELAT  [reduce using rule 18 (EXP)]
+    '+'       [reduce using rule 18 (EXP)]
+    '-'       [reduce using rule 18 (EXP)]
+    '*'       [reduce using rule 18 (EXP)]
+    '/'       [reduce using rule 18 (EXP)]
+    '%'       [reduce using rule 18 (EXP)]
+    $default  reduce using rule 18 (EXP)
 
 
 State 40
+
+   13 EXP: EXP . '+' EXP
+   13    | EXP '+' EXP .
+   14    | EXP . '-' EXP
+   15    | EXP . '*' EXP
+   16    | EXP . '/' EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
+
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
+
+    TK_OR     [reduce using rule 13 (EXP)]
+    TK_AND    [reduce using rule 13 (EXP)]
+    TK_RELAT  [reduce using rule 13 (EXP)]
+    $default  reduce using rule 13 (EXP)
+
+
+State 41
+
+   13 EXP: EXP . '+' EXP
+   14    | EXP . '-' EXP
+   14    | EXP '-' EXP .
+   15    | EXP . '*' EXP
+   16    | EXP . '/' EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
+
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
+
+    TK_OR     [reduce using rule 14 (EXP)]
+    TK_AND    [reduce using rule 14 (EXP)]
+    TK_RELAT  [reduce using rule 14 (EXP)]
+    $default  reduce using rule 14 (EXP)
+
+
+State 42
+
+   13 EXP: EXP . '+' EXP
+   14    | EXP . '-' EXP
+   15    | EXP . '*' EXP
+   15    | EXP '*' EXP .
+   16    | EXP . '/' EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
+
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+
+    TK_OR     [reduce using rule 15 (EXP)]
+    TK_AND    [reduce using rule 15 (EXP)]
+    TK_RELAT  [reduce using rule 15 (EXP)]
+    $default  reduce using rule 15 (EXP)
+
+
+State 43
 
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
    16    | EXP '/' EXP .
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
 
     TK_OR     [reduce using rule 16 (EXP)]
     TK_AND    [reduce using rule 16 (EXP)]
+    TK_RELAT  [reduce using rule 16 (EXP)]
     $default  reduce using rule 16 (EXP)
 
 
-State 41
+State 44
+
+   13 EXP: EXP . '+' EXP
+   14    | EXP . '-' EXP
+   15    | EXP . '*' EXP
+   16    | EXP . '/' EXP
+   17    | EXP . '%' EXP
+   17    | EXP '%' EXP .
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
+
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+
+    TK_OR     [reduce using rule 17 (EXP)]
+    TK_AND    [reduce using rule 17 (EXP)]
+    TK_RELAT  [reduce using rule 17 (EXP)]
+    $default  reduce using rule 17 (EXP)
+
+
+State 45
 
    10 ATTR: TK_TYPE TK_ID '=' EXP .
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
     $default  reduce using rule 10 (ATTR)
 
 
-State 42
+State 46
 
    11 ATTR: TK_NUMBER TK_ID '=' EXP .
    13 EXP: EXP . '+' EXP
    14    | EXP . '-' EXP
    15    | EXP . '*' EXP
    16    | EXP . '/' EXP
-   17    | EXP . TK_OR EXP
-   18    | EXP . TK_AND EXP
+   17    | EXP . '%' EXP
+   18    | EXP . TK_RELAT EXP
+   19    | EXP . TK_OR EXP
+   20    | EXP . TK_AND EXP
 
-    TK_OR   shift, and go to state 23
-    TK_AND  shift, and go to state 24
-    '+'     shift, and go to state 25
-    '-'     shift, and go to state 26
-    '*'     shift, and go to state 27
-    '/'     shift, and go to state 28
+    TK_OR     shift, and go to state 23
+    TK_AND    shift, and go to state 24
+    TK_RELAT  shift, and go to state 25
+    '+'       shift, and go to state 26
+    '-'       shift, and go to state 27
+    '*'       shift, and go to state 28
+    '/'       shift, and go to state 29
+    '%'       shift, and go to state 30
 
     $default  reduce using rule 11 (ATTR)
