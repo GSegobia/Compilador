@@ -9,7 +9,7 @@ LETTER [A-Za-z_]
 
 DELIM {SPACE}+
 NUM {DIGIT}+
-FLOAT {NUM}+("."{NUM}+)?
+FLOAT {NUM}+("\."{NUM}+)?
 CHAR \'({LETTER}|{DIGIT})\'
 ID {LETTER}({LETTER}|{NUM})*
 
@@ -59,7 +59,6 @@ ID {LETTER}({LETTER}|{NUM})*
 
 [+\-*/=]	{return *yytext;}
 
-{NUM}		{yylval.translate = yytext; return TK_NUM;}
 {FLOAT}		{yylval.translate = yytext; return TK_REAL;}
 {CHAR}      {yylval.translate = yytext; return TK_CHAR;}
 {ID}		{yylval.label = yytext; return TK_ID;}
