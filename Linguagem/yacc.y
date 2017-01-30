@@ -30,7 +30,7 @@ void yyerror(string);
 %start S
 
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %left '^'
 %left '(' ')'
 
@@ -38,7 +38,7 @@ void yyerror(string);
 
 S           : TK_START BLOCK
             {
-                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << $2.translate <<"\treturn 0;\n}" << endl;
+                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << "\n---- FIM DAS ATRIBUIÇÕES ----\n \n"<< $2.translate <<"\n \treturn 0;\n}" << endl;
             }
             ;
 
@@ -144,6 +144,20 @@ EXP         : EXP '+' EXP
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
+            }
+            | EXP '%' EXP
+            {
+                $$.type = get_operation_type($1.type, $3.type, "%");
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " % " + $3.temp + ";\n";
+            }
+            | EXP TK_RELAT EXP
+            {
+              $$.type = "bool";
+              $$.temp = set_variable(current_exp(), $$.type);
+              $$.attributions = $1.attributions + $3.attributions + "\t" + $$.type + " " + $$.temp + ";\n";
+              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " " + $2.translate + " " + $3.temp + ";\n";
             }
             /*| '|' EXP '|'
             {
