@@ -1,5 +1,6 @@
 start:
-	number a
+    number a = 5
+    number b = 7
 
-	a = 17
+    number c = a + b
 end
