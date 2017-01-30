@@ -17,24 +17,24 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [ ] Explícita
 
   ### Operadores Lógicos
-  - [ ] not
-  - [ ] or
-  - [ ] and
+  - [x] not
+  - [x] or
+  - [x] and
 
   ### Operadores Aritméticos
   - [x] + (Soma)
   - [x] - (Subtração)
-  - [ ] * (Multiplicação)
-  - [ ] / (Divisão)
-  - [ ] % (Módulo)
+  - [x] * (Multiplicação)
+  - [x] / (Divisão)
+  - [x] % (Módulo)
 
   ### Operadores Relacionais
-  - [ ] == (Igualdade)
-  - [ ] != (Diferença)
-  - [ ] < (Menor que)
-  - [ ] > (Maior que)
-  - [ ] <= (Menor ou Igual)
-  - [ ] >= (Maior ou Igual)
+  - [x] == (Igualdade)
+  - [x] != (Diferença)
+  - [x] < (Menor que)
+  - [x] > (Maior que)
+  - [x] <= (Menor ou Igual)
+  - [x] >= (Maior ou Igual)
 
 ## Entrega 2
 
