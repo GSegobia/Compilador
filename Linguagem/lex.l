@@ -9,8 +9,8 @@ LETTER [A-Za-z_]
 
 DELIM {SPACE}+
 NUM {DIGIT}+
-FLOAT {NUM}+("\."{NUM}+)?
-CHAR \'({LETTER}|{DIGIT})\'
+FLOAT ([-|+]?){NUM}+([.]{NUM}+)?
+CHAR '({LETTER}|{DIGIT})'
 ID {LETTER}({LETTER}|{NUM})*
 
 %%
@@ -51,7 +51,6 @@ ID {LETTER}({LETTER}|{NUM})*
 "-="		{yylval.translate = yytext; return TK_MINUS_EQUAL;}
 "*="		{yylval.translate = yytext; return TK_MULTIPLIES_EQUAL;}
 "/="		{yylval.translate = yytext; return TK_DIVIDES_EQUAL;}
-
 
 [(){}[\];,:]	{return *yytext;}
 

@@ -1,4 +1,6 @@
 %{
+#include <iostream>
+#include <fstream>
 #include "functions.h"
 
 #define YYSTYPE attributes
@@ -22,6 +24,7 @@ void yyerror(string);
 
 %token TK_START TK_END
 %token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
+%token TK_ALG
 %token TK_REAL TK_CHAR TK_BOOL
 %token TK_OR TK_AND TK_NOT
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
@@ -36,18 +39,33 @@ void yyerror(string);
 
 %%
 
-S           : TK_START BLOCK
-            {
-                cout << "/*Cry me a Ocean*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $2.attributions << "\n---- FIM DAS ATRIBUIÇÕES ----\n \n"<< $2.translate <<"\n \treturn 0;\n}" << endl;
-            }
-            ;
+S   : TK_START BLOCK
+    {
+        ofstream compiled("compiled.cpp");
+        if(compiled.is_open()){
+            compiled << "/*Cry me a Ocean*/\n#include <iostream>\n#include <string>\n";
+            compiled << "int main(){\n";
+            compiled << $2.attributions;
+            compiled << "\n---- FIM DAS ATRIBUIÇÕES ----\n\n";
+            compiled << $2.translate;
+            compiled << "\n \treturn 0;\n}\n";
+            cout << "Compilation success!" << endl;
+            compiled.close();
+        }
+        else cout << "Unable to open file. Couldn\'t generate compiled.cpp.";
 
-BLOCK       : ':' COMMANDS TK_END '\n'
-            {
-                $$.attributions = $2.attributions;
-                $$.translate = $2.translate;
-            }
-            ;
+        for(auto i : variable){
+            cout << i.first << " : " << "[" << i.second.type << ","<< i.second.tmp << "]" << endl;
+        }
+    }
+    ;
+
+BLOCK   : ':' COMMANDS TK_END '\n'
+        {
+            $$.attributions = $2.attributions;
+            $$.translate = $2.translate;
+        }
+        ;
 
 COMMANDS    : COMMAND COMMANDS
             {
@@ -118,7 +136,8 @@ ATTR        : TK_TYPE TK_ID
 
 EXP         : EXP '+' EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, "+");
+                $$.type = get_type(get_operation_type($1.type, $3.type, "+"));
+                cout << $$.type << endl;
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " + " + $3.temp + ";\n";
@@ -126,38 +145,38 @@ EXP         : EXP '+' EXP
             }
             | EXP '-' EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, "-");
+                $$.type = get_type(get_operation_type($1.type, $3.type, "-"));
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " - " + $3.temp + ";\n";
             }
             | EXP '*' EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, "*");
+                $$.type = get_type(get_operation_type($1.type, $3.type, "*"));
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " * " + $3.temp + ";\n";
             }
             | EXP '/' EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, "/");
+                $$.type = get_type(get_operation_type($1.type, $3.type, "/"));
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
             }
             | EXP '%' EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, "%");
+                $$.type = get_type(get_operation_type($1.type, $3.type, "%"));
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " % " + $3.temp + ";\n";
             }
             | EXP TK_RELAT EXP
             {
-              $$.type = "bool";
-              $$.temp = set_variable(current_exp(), $$.type);
-              $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " " + $2.translate + " " + $3.temp + ";\n";
+                $$.type = get_operation_type($1.type, $3.type, $2.translate);
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " " + $2.translate + " " + $3.temp + ";\n";
             }
             /*| '|' EXP '|'
             {
@@ -168,17 +187,17 @@ EXP         : EXP '+' EXP
             }*/
             | EXP TK_OR EXP
             {
-              $$.type = "bool";
-              $$.temp = set_variable(current_exp(), $$.type);
-              $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " || " + $3.temp + ";\n";
+                $$.type = get_operation_type($1.type, $3.type, $2.translate);
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " || " + $3.temp + ";\n";
             }
             | EXP TK_AND EXP
             {
-              $$.type = "bool";
-              $$.temp = set_variable(current_exp(), $$.type);
-              $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-              $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " && " + $3.temp + ";\n";
+                $$.type = get_operation_type($1.type, $3.type, $2.translate);
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " && " + $3.temp + ";\n";
             }
             | TK_REAL
             {

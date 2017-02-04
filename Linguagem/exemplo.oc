@@ -1,6 +1,6 @@
 start:
-    number a = 5
-    number b = 7
+    number a = 10
+    number b = 20
 
     number c = a + b
 end

@@ -99,4 +99,4 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 
  - [ ] Alinhamento Sintaxe da Linguagem
  - [ ] Alinhamento Features Importantes
- - [ ] Criação de Arquivo .cpp com Código Intermediário
+ - [x] Criação de Arquivo .cpp com Código Intermediário
