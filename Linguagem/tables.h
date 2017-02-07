@@ -47,7 +47,7 @@ map<string, string> types_map = {
                                               {"int64", "long int"},
                                               {"int32", "int"},
                                               {"int16", "short int"},
-                                              {"string", "char *"},
+                                              {"string", "char* "},
                                               {"char", "char"},
                                               {"bool", "int"}
                                         };

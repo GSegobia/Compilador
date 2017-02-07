@@ -10,6 +10,8 @@ LETTER [A-Za-z_]
 DELIM {SPACE}+
 NUM {DIGIT}+
 FLOAT {NUM}+([.]{NUM}+)?
+STRING [^"\\]*(?:\\.[^"\\]*)*
+STRING_QUOTE \'{STRING}\'|\"{STRING}\"
 CHAR '({LETTER}|{DIGIT})'
 ID {LETTER}({LETTER}|{NUM})*
 
@@ -29,6 +31,7 @@ ID {LETTER}({LETTER}|{NUM})*
 
 "char"		{yylval.translate = yytext; return TK_TYPE;}
 "bool"		{yylval.translate = yytext; return TK_TYPE;}
+"string"    {yylval.translate = yytext; return TK_TYPE;}
 
 "true"      {yylval.translate = yytext; return TK_BOOL;}
 "false"     {yylval.translate = yytext; return TK_BOOL;}
@@ -42,6 +45,9 @@ ID {LETTER}({LETTER}|{NUM})*
 "else"      {yylval.translate = yytext; return TK_ELSE;}
 
 "while"     {yylval.translate = yytext; return TK_WHILE;}
+
+"repeat"        {yylval.translate = yytext; return TK_REPEAT;}
+"until"     {yylval.translate = yytext; return TK_UNTIL;}
 
 "outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
 
@@ -72,6 +78,7 @@ ID {LETTER}({LETTER}|{NUM})*
 
 {FLOAT}		{yylval.translate = yytext; return TK_REAL;}
 {CHAR}      {yylval.translate = yytext; return TK_CHAR;}
+{STRING_QUOTE}    {yylval.translate = yytext; return TK_STRING;}
 {ID}		{yylval.label = yytext; return TK_ID;}
 
 .			{ *yytext; }

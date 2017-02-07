@@ -6,6 +6,12 @@ start:
     number e = 1 + 1
     number i = 0
 
+    string first_name = "Gabriel"
+    string last_name = 'Segobia'
+
+    outl << first_name
+    outl << last_name
+
     if 1 < b:
         outl << a
     elif b > c:
@@ -20,4 +26,9 @@ start:
         i = i + 1
         outl << i
     end
+
+    repeat:
+        outl << a
+        a = a + 1
+    until a < b
 end

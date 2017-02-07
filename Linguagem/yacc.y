@@ -1,6 +1,7 @@
 %{
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "functions.h"
 
 #define YYSTYPE attributes
@@ -29,8 +30,8 @@ void yyerror(string);
 %token TK_START TK_END
 %token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
 %token TK_IF TK_ELIF TK_ELSE
-%token TK_WHILE
-%token TK_REAL TK_CHAR TK_BOOL
+%token TK_WHILE TK_REPEAT TK_UNTIL
+%token TK_REAL TK_CHAR TK_BOOL TK_STRING
 %token TK_OR TK_AND TK_NOT
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
 %token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
@@ -50,7 +51,7 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <string>\n\nusing namespace std;";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\nusing namespace std;\n\n";
                     compiled << "int main(){\n";
                     compiled << $1.attributions;
                     compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
@@ -106,6 +107,20 @@ WHILE_COM   : TK_WHILE EXP BLOCK
 
                 $$.attributions = $2.attributions;
                 $$.translate = "\t" + $$.return_block_label + ":\n" + $2.translate + "\n\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n";
+
+                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
+            }
+            ;
+
+DO_WHILE_COM: TK_REPEAT ':' COMMANDS TK_UNTIL EXP
+            {
+                string label_auto_return = current_label();
+
+                $$.start_block_label = current_label();
+                $$.return_block_label = current_label();
+
+                $$.attributions = $5.attributions;
+                $$.translate = "\t" + label_auto_return + ":\n\tgoto " + $$.start_block_label + ";\n\t" + $$.return_block_label + ":\n" + $5.translate + "\tif(" + $5.temp + ") goto " + label_auto_return + ";\n";
 
                 $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
             }
@@ -221,6 +236,12 @@ COMMAND     : EXP '\n'
                 $$.block = $1.block;
             }
             | WHILE_COM
+            {
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+                $$.block = $1.block;
+            }
+            | DO_WHILE_COM
             {
                 $$.attributions = $1.attributions;
                 $$.translate = $1.translate;
@@ -347,6 +368,13 @@ EXP         : EXP '+' EXP
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
+            }
+            | TK_STRING
+            {
+                $$.type = "string";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = (char*)\"" + $1.translate.substr(1, $1.translate.length() - 2) + "\";\n";
             }
             | TK_CHAR
             {

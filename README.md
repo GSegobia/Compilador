@@ -41,14 +41,14 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [x] Bloco
   - [ ] Contexto
   - [ ] Escopo Global
-  - [ ] String
+  - [x] String
   - [ ] Comandos de Entrada e Saída
 
   ### Comandos
   - [x] if
   - [x] if/else
   - [x] while
-  - [ ] do/while
+  - [x] do/while
   - [ ] for
   - [ ] switch
 
