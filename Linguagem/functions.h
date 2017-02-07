@@ -48,7 +48,7 @@ string set_variable(string var_name, string var_type){
         exit(EXIT_FAILURE);
     }
 
-    var_aux.type = var_type;
+    var_aux.type = get_type(var_type);
     var_aux.tmp = current_temp();
 
     variable.insert(pair<string, META_VAR>(var_name, var_aux));

@@ -9,7 +9,7 @@ LETTER [A-Za-z_]
 
 DELIM {SPACE}+
 NUM {DIGIT}+
-FLOAT ([-|+]?){NUM}+([.]{NUM}+)?
+FLOAT {NUM}+([.]{NUM}+)?
 CHAR '({LETTER}|{DIGIT})'
 ID {LETTER}({LETTER}|{NUM})*
 
@@ -40,6 +40,8 @@ ID {LETTER}({LETTER}|{NUM})*
 "if"        {yylval.translate = yytext; return TK_IF;}
 "elif"      {yylval.translate = yytext; return TK_ELIF;}
 "else"      {yylval.translate = yytext; return TK_ELSE;}
+
+"while"     {yylval.translate = yytext; return TK_WHILE;}
 
 "outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
 

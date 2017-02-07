@@ -3,8 +3,10 @@ start:
     number b = 20
     number c = 30
     number d = 40
+    number e = 1 + 1
+    number i = 0
 
-    if a > b:
+    if 1 < b:
         outl << a
     elif b > c:
         outl << b
@@ -12,5 +14,10 @@ start:
         outl << c
     else:
         outl << d
+    end
+
+    while i < a:
+        i = i + 1
+        outl << i
     end
 end

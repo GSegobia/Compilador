@@ -29,6 +29,7 @@ void yyerror(string);
 %token TK_START TK_END
 %token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
 %token TK_IF TK_ELIF TK_ELSE
+%token TK_WHILE
 %token TK_REAL TK_CHAR TK_BOOL
 %token TK_OR TK_AND TK_NOT
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
@@ -95,6 +96,18 @@ BLOCK       : ':' COMMANDS TK_END '\n'
                 $$.translate = $2.translate;
 
                 $$.block = $2.block;
+            }
+            ;
+
+WHILE_COM   : TK_WHILE EXP BLOCK
+            {
+                $$.start_block_label = current_label();
+                $$.return_block_label = current_label();
+
+                $$.attributions = $2.attributions;
+                $$.translate = "\t" + $$.return_block_label + ":\n" + $2.translate + "\n\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n";
+
+                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
             }
             ;
 
@@ -202,6 +215,12 @@ COMMAND     : EXP '\n'
                 $$.block = "";
             }
             | IF_COMMAND
+            {
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+                $$.block = $1.block;
+            }
+            | WHILE_COM
             {
                 $$.attributions = $1.attributions;
                 $$.translate = $1.translate;

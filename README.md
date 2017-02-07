@@ -47,7 +47,7 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   ### Comandos
   - [x] if
   - [x] if/else
-  - [ ] while
+  - [x] while
   - [ ] do/while
   - [ ] for
   - [ ] switch
