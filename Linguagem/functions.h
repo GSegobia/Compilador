@@ -81,18 +81,34 @@ string parse_boolean(string value){
     return "0";
 }
 
+string current_label(){
+
+    static long int label_number = 0;
+
+    string label = "LABEL_" + to_string(label_number);
+
+    label_number++;
+
+    return label;
+}
+
 //Corrigir essa função
 string get_operation_type(string type1, string type2, string op){
 
     validate_type(type1);
     validate_type(type2);
 
+    string type;
+
     if(type1 == type2)
-        return type1;
-    else{
+        type = op_type[op];
+
+    if(type == ""){
         cout << "Type \'" << type1 << "\' can not \'" << op << "\' type \'" << type2 << "\'." << endl;
         exit(EXIT_FAILURE);
     }
+
+    return type;
     // string type = "";
     //
     // for(int i = 0; i < OPERATORS; i++){

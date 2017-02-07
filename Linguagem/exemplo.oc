@@ -1,6 +1,16 @@
 start:
     number a = 10
     number b = 20
+    number c = 30
+    number d = 40
 
-    number c = a + b
+    if a > b:
+        outl << a
+    elif b > c:
+        outl << b
+    elif c > d:
+        outl << c
+    else:
+        outl << d
+    end
 end

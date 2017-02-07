@@ -38,15 +38,15 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 
 ## Entrega 2
 
-  - [ ] Bloco
+  - [x] Bloco
   - [ ] Contexto
   - [ ] Escopo Global
   - [ ] String
   - [ ] Comandos de Entrada e Saída
 
   ### Comandos
-  - [ ] if
-  - [ ] if/else
+  - [x] if
+  - [x] if/else
   - [ ] while
   - [ ] do/while
   - [ ] for

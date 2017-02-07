@@ -37,6 +37,16 @@ ID {LETTER}({LETTER}|{NUM})*
 "or"		{yylval.translate = yytext; return TK_OR;}
 "not"		{yylval.translate = yytext; return TK_NOT;}
 
+"if"        {yylval.translate = yytext; return TK_IF;}
+"elif"      {yylval.translate = yytext; return TK_ELIF;}
+"else"      {yylval.translate = yytext; return TK_ELSE;}
+
+"outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
+
+"::"        {yylval.translate = yytext; return TK_DOUBLE_COLON;}
+"<<"        {yylval.translate = yytext; return TK_SHIFT_LEFT;}
+">>"        {yylval.translate = yytext; return TK_SHIFT_RIGHT;}
+
 "=="        {yylval.translate = yytext; return TK_RELAT;}
 "!="        {yylval.translate = yytext; return TK_RELAT;}
 "<"         {yylval.translate = yytext; return TK_RELAT;}

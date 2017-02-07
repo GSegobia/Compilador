@@ -59,3 +59,20 @@ map<string, list<string>> implicit_cast = {
                                                     {"int32", {"float64", "int64", "int32"}},
                                                     {"int16", {"int32", "int64", "float32", "float64"}}
                                               };
+
+map<string, string> op_type = {
+                                    {"+", "number"},
+                                    {"-", "number"},
+                                    {"*", "number"},
+                                    {"/", "number"},
+                                    {"%", "number"},
+                                    {"and", "bool"},
+                                    {"or", "bool"},
+                                    {"not", "bool"},
+                                    {"==", "bool"},
+                                    {"!=", "bool"},
+                                    {"<", "bool"},
+                                    {"<=", "bool"},
+                                    {">", "bool"},
+                                    {">=", "bool"}
+                              };
