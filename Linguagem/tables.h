@@ -3,6 +3,7 @@
 #include <sstream>
 #include <map>
 #include <list>
+#include <stack>
 #include <cassert>
 
 #define OPERATORS 5
@@ -76,3 +77,11 @@ map<string, string> op_type = {
                                     {">", "bool"},
                                     {">=", "bool"}
                               };
+
+map<string, string> unary_op_type = {
+                                        {"++", "float64"},
+                                        {"--", "float64"},
+                                        {"not", "bool"}
+                                    };
+
+stack<string> switch_stack;

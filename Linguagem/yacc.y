@@ -30,7 +30,9 @@ void yyerror(string);
 %token TK_START TK_END
 %token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
 %token TK_IF TK_ELIF TK_ELSE
+%token TK_PLUS_PLUS TK_MINUS_MINUS
 %token TK_WHILE TK_REPEAT TK_UNTIL
+%token TK_SWITCH TK_CASE TK_DEFAULT
 %token TK_REAL TK_CHAR TK_BOOL TK_STRING
 %token TK_OR TK_AND TK_NOT
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
@@ -112,7 +114,7 @@ WHILE_COM   : TK_WHILE EXP BLOCK
             }
             ;
 
-DO_WHILE_COM: TK_REPEAT ':' COMMANDS TK_UNTIL EXP
+DO_WHILE_COM: TK_REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
             {
                 string label_auto_return = current_label();
 
@@ -202,6 +204,14 @@ ELSE_BLOCK  : TK_ELSE BLOCK
             }
             ;
 
+SWITCH_COM  : TK_SWITCH PRIMITIVE BLOCK
+            {
+                $$.attributions = "";
+                $$.translate = "";
+                $$.block = "";
+            }
+            ;
+
 COMMANDS    : COMMAND COMMANDS
             {
                 $$.attributions = $1.attributions + $2.attributions;
@@ -242,6 +252,12 @@ COMMAND     : EXP '\n'
                 $$.block = $1.block;
             }
             | DO_WHILE_COM
+            {
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+                $$.block = $1.block;
+            }
+            | SWITCH_COM
             {
                 $$.attributions = $1.attributions;
                 $$.translate = $1.translate;
@@ -362,12 +378,58 @@ EXP         : EXP '+' EXP
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " && " + $3.temp + ";\n";
             }
-            | TK_REAL
+            | PRIMITIVE
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+            }
+            | UNARY_EXP
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+            }
+            ;
+
+UNARY_EXP   : PRIMITIVE TK_PLUS_PLUS
+            {
+                $$.type = get_unary_operation_type($1.type, $2.translate);
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + "\t" + $$.temp + " = " + $1.temp + " + 1;\n";
+            }
+            | PRIMITIVE TK_MINUS_MINUS
+            {
+                $$.type = get_unary_operation_type($1.type, $2.translate);
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $1.translate + "\t" + $$.temp + " = " + $1.temp + " - 1;\n";
+            }
+            ;
+
+PRIMITIVE   : TK_REAL
             {
                 $$.type = "float64";
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
+            }
+            | '-' TK_REAL
+            {
+                $$.type = "float64";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = -" + $2.translate + ";\n";
+            }
+            | '+' TK_REAL
+            {
+                $$.type = "float64";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + $2.translate + ";\n";
             }
             | TK_STRING
             {

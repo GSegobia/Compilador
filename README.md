@@ -63,7 +63,7 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [ ] Inicialização de Variáveis
   - [ ] Inicialização de Matrizes
   - [ ] Operadores Compostos
-  - [ ] Operadores Unários
+  - [x] Operadores Unários
   - [ ] Detecção de Erros
 
 ## Features

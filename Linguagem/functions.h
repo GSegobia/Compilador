@@ -92,6 +92,17 @@ string current_label(){
     return label;
 }
 
+string get_unary_operation_type(string type, string op){
+
+    validate_type(type);
+
+    if(unary_op_type[op] == type)
+        return type;
+
+    cout << "Invalid operation " << op << " for variables of "<< type << " type." << endl;
+    exit(EXIT_FAILURE);
+}
+
 //Corrigir essa função
 string get_operation_type(string type1, string type2, string op){
 

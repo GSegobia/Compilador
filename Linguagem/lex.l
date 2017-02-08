@@ -46,8 +46,12 @@ ID {LETTER}({LETTER}|{NUM})*
 
 "while"     {yylval.translate = yytext; return TK_WHILE;}
 
-"repeat"        {yylval.translate = yytext; return TK_REPEAT;}
+"repeat"    {yylval.translate = yytext; return TK_REPEAT;}
 "until"     {yylval.translate = yytext; return TK_UNTIL;}
+
+"switch"    {yylval.translate = yytext; return TK_SWITCH;}
+"case"      {yylval.translate = yytext; return TK_CASE;}
+"default"   {yylval.translate = yytext; return TK_DEFAULT;}
 
 "outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
 
@@ -69,6 +73,9 @@ ID {LETTER}({LETTER}|{NUM})*
 "-="		{yylval.translate = yytext; return TK_MINUS_EQUAL;}
 "*="		{yylval.translate = yytext; return TK_MULTIPLIES_EQUAL;}
 "/="		{yylval.translate = yytext; return TK_DIVIDES_EQUAL;}
+
+"++"        {yylval.translate = yytext; return TK_PLUS_PLUS;}
+"--"        {yylval.translate = yytext; return TK_MINUS_MINUS;}
 
 [(){}[\];,:]	{return *yytext;}
 
