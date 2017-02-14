@@ -77,6 +77,8 @@ ID {LETTER}({LETTER}|{NUM})*
 "++"        {yylval.translate = yytext; return TK_PLUS_PLUS;}
 "--"        {yylval.translate = yytext; return TK_MINUS_MINUS;}
 
+""          {yylval.translate = yytext; return TK_INITIALIZE_SWITCH;}
+
 [(){}[\];,:]	{return *yytext;}
 
 "\n"		{return *yytext;}

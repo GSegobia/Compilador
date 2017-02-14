@@ -50,7 +50,7 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [x] while
   - [x] do/while
   - [ ] for
-  - [ ] switch
+  - [x] switch
 
   ### Controle de Laços
   - [ ] break

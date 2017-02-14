@@ -18,6 +18,12 @@ typedef struct{
     string tmp;
 }META_VAR;
 
+typedef struct{
+
+    string start_block;
+    string return_block;
+}LABELS;
+
 map<string, META_VAR> variable;
 
 string types[] = {"float", "int", "bool", "char", "number"};
@@ -43,6 +49,7 @@ map<string,string> type_value = {
 
 map<string, string> types_map = {
                                               {"number", "float64"},
+                                              {"undefined", "undefined"},
                                               {"float64", "double"},
                                               {"float32", "float"},
                                               {"int64", "long int"},
@@ -84,4 +91,6 @@ map<string, string> unary_op_type = {
                                         {"not", "bool"}
                                     };
 
-stack<string> switch_stack;
+stack<LABELS> loop_stack;
+stack<string> conditional_return_stack;
+stack<string> switch_temp;

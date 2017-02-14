@@ -5,12 +5,15 @@ start:
     number d = 40
     number e = 1 + 1
     number i = 0
+    bool h = true
 
     string first_name = "Gabriel"
     string last_name = 'Segobia'
 
     outl << first_name
     outl << last_name
+
+    number u = b++
 
     if 1 < b:
         outl << a
@@ -31,4 +34,15 @@ start:
         outl << a
         a = a + 1
     until a < b
+
+    switch a:
+        case 10:
+            a = 50
+        case 20:
+            a = 100
+        default:
+            a = 200
+    end
+
+    outl << a
 end

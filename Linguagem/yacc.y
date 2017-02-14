@@ -39,6 +39,7 @@ void yyerror(string);
 %token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 %token TK_DOUBLE_COLON TK_SHIFT_LEFT TK_SHIFT_RIGHT
 %token TK_OUT_LINE
+%token TK_INITIALIZE_SWITCH
 
 %start S
 
@@ -108,7 +109,7 @@ WHILE_COM   : TK_WHILE EXP BLOCK
                 $$.return_block_label = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = "\t" + $$.return_block_label + ":\n" + $2.translate + "\n\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n";
+                $$.translate = "\t" + $$.return_block_label + ":\n" + $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n";
 
                 $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
             }
@@ -204,11 +205,78 @@ ELSE_BLOCK  : TK_ELSE BLOCK
             }
             ;
 
-SWITCH_COM  : TK_SWITCH PRIMITIVE BLOCK
+SWITCH_COM  : SWITCH PRIMITIVE ':' '\n' CASE
             {
+                variable[switch_temp.top()].type = $2.type;
+
+                $$.attributions = "\t" + get_type(variable[switch_temp.top()].type) +
+                                  " " + variable[switch_temp.top()].tmp + ";//ATTRIBUTION SWITCH\n" + $5.attributions;
+                $$.translate = "\t" + variable[switch_temp.top()].tmp + " = " + $2.temp + ";//DECLARATION SWITCH\n" +   $5.translate;
+                $$.block = $5.block;
+
+                switch_temp.pop();
+                conditional_return_stack.pop();
+            }
+            ;
+
+CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
+            {
+                string block_label = current_label();
+
+                $$.type = "bool";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
+                                ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
+                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $4.block;
+            }
+            | TK_CASE PRIMITIVE ':' COMMANDS CASE
+            {
+                string block_label = current_label();
+
+                $$.type = "bool";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $5.attributions;
+                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
+                                ") goto " + block_label + ";\n" + $5.translate;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
+                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + $4.block;
+            }
+            | TK_CASE PRIMITIVE ':' COMMANDS DEFAULT
+            {
+                string block_label = current_label();
+
+                $$.type = "bool";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $5.attributions;
+                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
+                                ") goto " + block_label + ";\n" + $5.translate;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
+                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+            }
+            ;
+
+DEFAULT     : TK_DEFAULT ':' COMMANDS TK_END
+            {
+                string block_label = current_label();
+
+                $$.type = "";
+                $$.temp = "";
                 $$.attributions = "";
-                $$.translate = "";
-                $$.block = "";
+                $$.translate = "\tgoto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
+                $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " +
+                            conditional_return_stack.top() + ";\n" + $3.block;
+            }
+            ;
+
+SWITCH      : TK_SWITCH
+            {
+                string current_var = current_exp();
+                set_variable(current_var, "undefined");
+                switch_temp.push(current_var);
+
+                conditional_return_stack.push(current_label());
             }
             ;
 
@@ -394,19 +462,20 @@ EXP         : EXP '+' EXP
             }
             ;
 
-UNARY_EXP   : PRIMITIVE TK_PLUS_PLUS
+UNARY_EXP   : VARIABLE TK_PLUS_PLUS
             {
+                cout << $1.type << endl;
                 $$.type = get_unary_operation_type($1.type, $2.translate);
-                $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $1.translate + "\t" + $$.temp + " = " + $1.temp + " + 1;\n";
+                $$.temp = $1.temp;
+                $$.attributions = "";
+                $$.translate = $1.translate + "\t" + $$.temp + " = " + $$.temp + " + 1;\n";
             }
-            | PRIMITIVE TK_MINUS_MINUS
+            | VARIABLE TK_MINUS_MINUS
             {
                 $$.type = get_unary_operation_type($1.type, $2.translate);
-                $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $1.translate + "\t" + $$.temp + " = " + $1.temp + " - 1;\n";
+                $$.temp = $1.temp;
+                $$.attributions = "";
+                $$.translate = $1.translate + "\t" + $$.temp + " = " + $$.temp + " - 1;\n";
             }
             ;
 
@@ -452,7 +521,16 @@ PRIMITIVE   : TK_REAL
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + parse_boolean($1.translate) + ";\n";
             }
-            | TK_ID
+            | VARIABLE
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = "";
+                $$.translate = "";
+            }
+            ;
+
+VARIABLE    : TK_ID
             {
                 $$.type = get_variable($1.label).type;
                 $$.temp = get_variable($1.label).tmp;
