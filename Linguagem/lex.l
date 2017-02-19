@@ -53,6 +53,9 @@ ID {LETTER}({LETTER}|{NUM})*
 "case"      {yylval.translate = yytext; return TK_CASE;}
 "default"   {yylval.translate = yytext; return TK_DEFAULT;}
 
+"break"     {yylval.translate = yytext; return TK_BREAK;}
+"continue"  {yylval.translate = yytext; return TK_CONTINUE;}
+
 "outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
 
 "::"        {yylval.translate = yytext; return TK_DOUBLE_COLON;}
@@ -76,8 +79,6 @@ ID {LETTER}({LETTER}|{NUM})*
 
 "++"        {yylval.translate = yytext; return TK_PLUS_PLUS;}
 "--"        {yylval.translate = yytext; return TK_MINUS_MINUS;}
-
-""          {yylval.translate = yytext; return TK_INITIALIZE_SWITCH;}
 
 [(){}[\];,:]	{return *yytext;}
 

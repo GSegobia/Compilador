@@ -15,9 +15,9 @@ start:
 
     number u = b++
 
-    if 1 < b:
+    if a > b:
         outl << a
-    elif b > c:
+    elif b < c:
         outl << b
     elif c > d:
         outl << c
@@ -28,12 +28,25 @@ start:
     while i < a:
         i = i + 1
         outl << i
+
+        if i == 5:
+            break
+        end
     end
 
     repeat:
-        outl << a
+
+        if a == 15:
+            outl << a
+            a++
+            continue
+        end
+
         a = a + 1
+        outl << a
     until a < b
+
+    a = 10
 
     switch a:
         case 10:

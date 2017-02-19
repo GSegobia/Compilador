@@ -103,6 +103,41 @@ string get_unary_operation_type(string type, string op){
     exit(EXIT_FAILURE);
 }
 
+void push_loop_block(){
+
+    LABELS current_loop;
+
+    string start = current_label();
+    string end = current_label();
+
+    current_loop.start_block = start;
+    current_loop.return_block = end;
+
+    loop_stack.push(current_loop);
+
+    return;
+}
+
+string break_to(){
+
+    string goto_label = "";
+
+    if(loop_stack.size() > 0)
+        goto_label = "\tgoto " + loop_stack.top().return_block + ";\n";
+
+    return goto_label;
+}
+
+string continue_to(){
+
+    string goto_label = "";
+
+    if(loop_stack.size() > 0)
+        goto_label = "\tgoto " + loop_stack.top().start_block + ";\n";
+
+    return goto_label;
+}
+
 //Corrigir essa função
 string get_operation_type(string type1, string type2, string op){
 

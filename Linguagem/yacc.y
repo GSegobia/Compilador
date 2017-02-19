@@ -15,10 +15,6 @@ struct attributes{
     string temp;
     string attributions;
     string translate;
-    string sentence;
-
-    string start_block_label;
-    string return_block_label;
     string block;
 };
 
@@ -32,6 +28,7 @@ void yyerror(string);
 %token TK_IF TK_ELIF TK_ELSE
 %token TK_PLUS_PLUS TK_MINUS_MINUS
 %token TK_WHILE TK_REPEAT TK_UNTIL
+%token TK_CONTINUE TK_BREAK
 %token TK_SWITCH TK_CASE TK_DEFAULT
 %token TK_REAL TK_CHAR TK_BOOL TK_STRING
 %token TK_OR TK_AND TK_NOT
@@ -39,7 +36,6 @@ void yyerror(string);
 %token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 %token TK_DOUBLE_COLON TK_SHIFT_LEFT TK_SHIFT_RIGHT
 %token TK_OUT_LINE
-%token TK_INITIALIZE_SWITCH
 
 %start S
 
@@ -82,8 +78,12 @@ S           : MAIN
 
                 for(auto i : variable)
                     cout << i.first << " : " << "[" << i.second.type << ","<< i.second.tmp << "]" << endl;
-                }
-                ;
+
+                cout << "Loop Stack Size: " << loop_stack.size() << endl;
+                cout << "Conditional Return Stack Size: " << conditional_return_stack.size() << endl;
+                cout << "Switch Variable Size: " << switch_temp.size() << endl;
+            }
+            ;
 
 MAIN        : TK_START BLOCK
             {
@@ -103,105 +103,179 @@ BLOCK       : ':' COMMANDS TK_END '\n'
             }
             ;
 
-WHILE_COM   : TK_WHILE EXP BLOCK
+WHILE_COM   : WHILE EXP BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = current_label();
+                string label_block = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = "\t" + $$.return_block_label + ":\n" + $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n";
+                $$.translate = "\t" + loop_stack.top().start_block + ":\n" + $2.translate + "\tif(" + $2.temp + ") goto " + label_block + ";\n\t" + loop_stack.top().return_block + ":\n";
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
+                $$.block = "\t" + label_block + ":\n" + $3.attributions + $3.translate + "\tgoto " + loop_stack.top().start_block + ";\n\n" + $3.block;
+
+                loop_stack.pop();
+                /*
+                LABEL_6:
+            	tmp_25 = tmp_13 < tmp_1;
+            	if(tmp_25) goto LABEL_5;
+
+                É necessário criar uma label após o if para ser o return_block.
+
+                Forma esperada:
+                    LABEL_5:
+                	tmp_25 = tmp_13 < tmp_1;
+                	if(tmp_25) goto LABEL_7;
+                    LABEL_6:
+
+                loop_stack.top().start_block = LABEL_5
+                loop_stack.top().return_block = LABEL_6
+                (Variável auxiliar de retorno) block_end = LABEL_7
+
+                break - goto LABEL_6
+                continue - goto LABEL_5
+
+                LABEL_5:
+            	tmp_25 = tmp_13 < tmp_1;
+            	if(tmp_25) goto LABEL_7;
+            	LABEL_6:
+                */
             }
             ;
 
-DO_WHILE_COM: TK_REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
+WHILE      : TK_WHILE
             {
-                string label_auto_return = current_label();
+                push_loop_block();
+            }
+            ;
 
-                $$.start_block_label = current_label();
-                $$.return_block_label = current_label();
+DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
+            {
+                string label_block = current_label();
 
                 $$.attributions = $5.attributions;
-                $$.translate = "\t" + label_auto_return + ":\n\tgoto " + $$.start_block_label + ";\n\t" + $$.return_block_label + ":\n" + $5.translate + "\tif(" + $5.temp + ") goto " + label_auto_return + ";\n";
+                $$.translate = "\tgoto " + label_block + ";\n\t" + loop_stack.top().start_block + ":\n" + $5.translate + "\tif(" + $5.temp + ") goto " + label_block + ";\n\t" + loop_stack.top().return_block + ":\n";
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
+                $$.block = "\t" + label_block + ":\n" + $3.attributions + $3.translate + "\tgoto " + loop_stack.top().start_block + ";\n\n" + $3.block;
+
+                loop_stack.pop();
+                /*
+                LABEL_9:
+            	goto LABEL_7;
+            	LABEL_8:
+            	tmp_30 = tmp_1 < tmp_3;
+            	if(tmp_30) goto LABEL_9;
+
+                Ao invés de ir para LABEL_9 o goto do if deveria ir direto para LABEL_7 fazendo com que LABEL_9
+                seja desnecessário nesse caso.
+
+                É necessário criar uma label após o if para ser o return_block.
+
+                Forma esperada:
+                    goto LABEL_9;
+                    LABEL_7:
+                    tmp_30 = tmp_1 < tmp_3;
+                    if(tmp_30) goto LABEL_9;
+                    LABEL_8:
+
+                loop_stack.top().start_block = LABEL_7
+                loop_stack.top().return_block = LABEL_8
+                (Variável auxiliar de retorno) block_end = LABEL_9
+
+                break - goto LABEL_8
+                continue - goto LABEL_7
+
+                goto LABEL_9;
+            	LABEL_7:
+            	tmp_30 = tmp_1 < tmp_3;
+            	if(tmp_30) goto LABEL_9;
+            	LABEL_8:
+                */
             }
             ;
 
-IF_COMMAND  : TK_IF EXP BLOCK
+REPEAT      : TK_REPEAT
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = current_label();
+                push_loop_block();
+            }
+            ;
+
+IF_COMMAND  : IF EXP BLOCK
+            {
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n\t" + $$.return_block_label + ":\n";
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
+                $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $3.block;
+
+                conditional_return_stack.pop();
             }
-            | TK_IF EXP ':' COMMANDS ELSE_BLOCK
+            | IF EXP ':' COMMANDS ELSE_BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = $5.return_block_label;
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n" + $5.translate;
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $5.block + "\n" + $4.block;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+
+                conditional_return_stack.pop();
             }
-            | TK_IF EXP ':' COMMANDS ELIF_BLOCK
+            | IF EXP ':' COMMANDS ELIF_BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = $5.return_block_label;
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions + $5.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n" + $5.translate;;
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;;
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $5.block + "\n" + $4.block;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+
+                conditional_return_stack.pop();
             }
             ;
 
 ELIF_BLOCK  : TK_ELIF EXP BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = current_label();
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n\t" + $$.return_block_label + ";\n";
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ";\n";
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $3.block;
+                $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $3.block;
             }
             | TK_ELIF EXP ':' COMMANDS ELIF_BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = $5.return_block_label;
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions + $5.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n" + $5.translate;
-                $$.block = "\t" + $$.start_block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $5.block + "\n" + $4.block;
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
             }
             | TK_ELIF EXP ':' COMMANDS ELSE_BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = $5.return_block_label;
+                string block_label = current_label();
 
                 $$.attributions = $2.attributions;
-                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + $$.start_block_label + ";\n" + $5.translate;
+                $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + $$.return_block_label + ";\n\n" + $5.block + "\n" + $4.block;
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
             }
             ;
 
 ELSE_BLOCK  : TK_ELSE BLOCK
             {
-                $$.start_block_label = current_label();
-                $$.return_block_label = current_label();
+                string block_label = current_label();
 
                 $$.attributions = "";
-                $$.translate = "\tgoto " + $$.start_block_label + ";\n\t" + $$.return_block_label + ":\n";
+                $$.translate = "\tgoto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
 
-                $$.block = "\t" + $$.start_block_label + ":\n" + $2.attributions + $2.translate
-                            + "\tgoto " + $$.return_block_label + ";\n\n" + $2.block;
+                $$.block = "\t" + block_label + ":\n" + $2.attributions + $2.translate
+                            + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $2.block;
+            }
+            ;
+
+IF          : TK_IF
+            {
+                conditional_return_stack.push(current_label());
             }
             ;
 
@@ -209,9 +283,10 @@ SWITCH_COM  : SWITCH PRIMITIVE ':' '\n' CASE
             {
                 variable[switch_temp.top()].type = $2.type;
 
-                $$.attributions = "\t" + get_type(variable[switch_temp.top()].type) +
-                                  " " + variable[switch_temp.top()].tmp + ";//ATTRIBUTION SWITCH\n" + $5.attributions;
+                $$.attributions = "\t" + get_type(variable[switch_temp.top()].type) + " " + variable[switch_temp.top()].tmp + ";//ATTRIBUTION SWITCH\n" + $5.attributions;
+
                 $$.translate = "\t" + variable[switch_temp.top()].tmp + " = " + $2.temp + ";//DECLARATION SWITCH\n" +   $5.translate;
+
                 $$.block = $5.block;
 
                 switch_temp.pop();
@@ -225,11 +300,11 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
 
                 $$.type = "bool";
                 $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n";
-                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
-                                ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
-                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
-                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $4.block;
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $2.attributions;
+
+                $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
+
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $4.block;
             }
             | TK_CASE PRIMITIVE ':' COMMANDS CASE
             {
@@ -237,11 +312,11 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
 
                 $$.type = "bool";
                 $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $5.attributions;
-                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
-                                ") goto " + block_label + ";\n" + $5.translate;
-                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
-                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + $4.block;
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $2.attributions + $5.attributions;
+
+                $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n" + $5.translate;
+
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + $4.block;
             }
             | TK_CASE PRIMITIVE ':' COMMANDS DEFAULT
             {
@@ -249,11 +324,11 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
 
                 $$.type = "bool";
                 $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $5.attributions;
-                $$.translate = "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp +
-                                ") goto " + block_label + ";\n" + $5.translate;
-                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate +
-                            "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+                $$.attributions = "\t" + $$.type + " " + $$.temp + ";\n" + $2.attributions + $5.attributions;
+
+                $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n" + $5.translate;
+
+                $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
             }
             ;
 
@@ -265,8 +340,8 @@ DEFAULT     : TK_DEFAULT ':' COMMANDS TK_END
                 $$.temp = "";
                 $$.attributions = "";
                 $$.translate = "\tgoto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
-                $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " +
-                            conditional_return_stack.top() + ";\n" + $3.block;
+
+                $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n" + $3.block;
             }
             ;
 
@@ -341,6 +416,19 @@ COMMAND     : EXP '\n'
             {
                 $$.attributions = "";
                 $$.translate = "\tcout << " + $3.temp + " << endl;\n";
+                $$.block = "";
+            }
+            | TK_BREAK '\n'
+            {
+                $$.attributions = "";
+                $$.translate = break_to();
+                $$.block = "";
+            }
+            | TK_CONTINUE '\n'
+            {
+                $$.attributions = "";
+                $$.translate = continue_to();
+                $$.block = "";
             }
             ;
 

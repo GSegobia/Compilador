@@ -53,14 +53,14 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
   - [x] switch
 
   ### Controle de Laços
-  - [ ] break
-  - [ ] continue
+  - [x] break
+  - [x] continue
 
 ## Entrega 3
 
   - [ ] Funções
   - [ ] Matrizes
-  - [ ] Inicialização de Variáveis
+  - [x] Inicialização de Variáveis
   - [ ] Inicialização de Matrizes
   - [ ] Operadores Compostos
   - [x] Operadores Unários
@@ -69,7 +69,7 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 ## Features
 
   - [ ] Ponteiros
-  - [ ] auto (Vinculação Dinâmica de Tipo)
+  - [ ] var (Vinculação Dinâmica de Tipo)
 
   ### Operadores Lógicos
   - [ ] xor
