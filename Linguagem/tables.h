@@ -4,6 +4,8 @@
 #include <map>
 #include <list>
 #include <stack>
+#include <vector>
+#include <algorithm>
 #include <cassert>
 
 #define OPERATORS 5
@@ -12,17 +14,26 @@
 
 using namespace std;
 
-typedef struct{
+struct META_VAR{
 
     string type;
     string tmp;
-}META_VAR;
+};
 
-typedef struct{
+struct META_FUNC{
+
+    string name;
+    string type;
+    vector<string> args;
+    vector<string> args_types;
+    vector<string> ordered_args_types;
+};
+
+struct LABELS{
 
     string start_block;
     string return_block;
-}LABELS;
+};
 
 map<string, META_VAR> variable;
 
@@ -94,3 +105,8 @@ map<string, string> unary_op_type = {
 stack<LABELS> loop_stack;
 stack<string> conditional_return_stack;
 stack<string> switch_temp;
+vector<META_FUNC> functions_list;
+META_FUNC current_function;
+
+map<string, META_VAR> global_scope;
+vector<map<string, META_VAR>> scope_variables = {global_scope};

@@ -44,6 +44,8 @@ ID {LETTER}({LETTER}|{NUM})*
 "elif"      {yylval.translate = yytext; return TK_ELIF;}
 "else"      {yylval.translate = yytext; return TK_ELSE;}
 
+"for"       {yylval.translate = yytext; return TK_FOR;}
+
 "while"     {yylval.translate = yytext; return TK_WHILE;}
 
 "repeat"    {yylval.translate = yytext; return TK_REPEAT;}
@@ -57,6 +59,10 @@ ID {LETTER}({LETTER}|{NUM})*
 "continue"  {yylval.translate = yytext; return TK_CONTINUE;}
 
 "outl"      {yylval.translate = yytext; return TK_OUT_LINE;}
+"out"       {yylval.translate = yytext; return TK_OUT;}
+"in"        {yylval.translate = yytext; return TK_IN;}
+
+"function"  {yylval.translate = yytext; return TK_FUNCTION;}
 
 "::"        {yylval.translate = yytext; return TK_DOUBLE_COLON;}
 "<<"        {yylval.translate = yytext; return TK_SHIFT_LEFT;}

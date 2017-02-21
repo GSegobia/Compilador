@@ -27,7 +27,8 @@ void yyerror(string);
 %token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
 %token TK_IF TK_ELIF TK_ELSE
 %token TK_PLUS_PLUS TK_MINUS_MINUS
-%token TK_WHILE TK_REPEAT TK_UNTIL
+%token TK_WHILE TK_REPEAT TK_UNTIL TK_FOR
+%token TK_IN TK_OUT TK_OUT_LINE
 %token TK_CONTINUE TK_BREAK
 %token TK_SWITCH TK_CASE TK_DEFAULT
 %token TK_REAL TK_CHAR TK_BOOL TK_STRING
@@ -35,7 +36,7 @@ void yyerror(string);
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
 %token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 %token TK_DOUBLE_COLON TK_SHIFT_LEFT TK_SHIFT_RIGHT
-%token TK_OUT_LINE
+%token TK_FUNCTION
 
 %start S
 
@@ -79,18 +80,113 @@ S           : MAIN
                 for(auto i : variable)
                     cout << i.first << " : " << "[" << i.second.type << ","<< i.second.tmp << "]" << endl;
 
+                cout << endl;
+                cout << "Loop Stack Size: " << loop_stack.size() << endl;
+                cout << "Conditional Return Stack Size: " << conditional_return_stack.size() << endl;
+                cout << "Switch Variable Size: " << switch_temp.size() << endl;
+            }
+            | FUNCTION MAIN
+            {
+                ofstream compiled("compiled.cpp");
+                if(compiled.is_open()){
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\nusing namespace std;\n\n";
+                    compiled << $1.translate;
+                    compiled << "\nint main(){\n";
+                    compiled << $2.attributions;
+                    compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
+                    compiled << $2.translate;
+                    compiled << "\n \treturn 0;\n\n";
+                    compiled << $2.block;
+                    compiled << "}\n";
+                    cout << "Compilation success!" << endl;
+                    compiled.close();
+                }
+                else
+                    cout << "Unable to open file. Couldn\'t generate intermediary code.";
+
+                // ofstream compiled_sentence("compiled_sentence.cpp");
+                // if(compiled_sentence.is_open()){
+                //     compiled_sentence << "/*Cry me a Ocean*/\n#include <iostream>\n#include <string>\n";
+                //     compiled_sentence << "int main(){\n";
+                //     compiled_sentence << $1.sentence;
+                //     compiled_sentence << "\n \treturn 0;\n}\n";
+                //     cout << "Compilation Sentence success!" << endl;
+                //     compiled_sentence.close();
+                // }
+                // else
+                //     cout << "Unable to open file. Couldn\'t generate intermediary code.";
+
+                for(auto i : variable)
+                    cout << i.first << " : " << "[" << i.second.type << ","<< i.second.tmp << "]" << endl;
+
+                cout << endl;
                 cout << "Loop Stack Size: " << loop_stack.size() << endl;
                 cout << "Conditional Return Stack Size: " << conditional_return_stack.size() << endl;
                 cout << "Switch Variable Size: " << switch_temp.size() << endl;
             }
             ;
 
-MAIN        : TK_START BLOCK
+FUNCTION    : FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ')' BLOCK
+            {
+                //META_FUNC aux = add_function($2.translate, $4.label);
+
+                $$.type = $2.translate;
+                $$.temp = current_func();
+                $$.attributions = "";
+                $$.translate = get_type($$.type) + " " + $$.temp + "(){\n" + $7.attributions + "\n" + $7.translate + "}\n";
+
+            }
+            ;
+
+FUNC        : TK_FUNCTION
+            {
+
+            }
+            ;
+
+// ARGS        : ARG
+//             {
+//                 $$.type = $1.translate;
+//                 $$.temp = $1.temp;
+//             }
+//             | TK_TYPE TK_ID ',' ARGS
+//             {
+//                 add_arg($1.translate, $2.label);
+//
+//                 $$.type = $1.translate + $4.translate;
+//                 $$.temp = $2.label + $4.label;
+//             }
+//             |
+//             {
+//                 $$.type = "";
+//                 $$.temp = "";
+//             }
+//             ;
+//
+// ARG         : TK_TYPE TK_ID
+//             {
+//                 add_arg($1.translate, $2.label);
+//
+//                 $$.type = $1.translate;
+//                 $$.temp = $2.label;
+//             }
+//             ;
+
+MAIN        : MAIN_INIT BLOCK
             {
                 $$.attributions = $2.attributions;
                 $$.translate = $2.translate;
 
                 $$.block = $2.block;
+
+                scope_variables.pop_back();
+            }
+            ;
+
+MAIN_INIT   : TK_START
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
@@ -103,6 +199,18 @@ BLOCK       : ':' COMMANDS TK_END '\n'
             }
             ;
 
+// FOR_COM     : FOR PRIMITIVE
+//             {
+//
+//             }
+//             ;
+//
+// FOR         : TK_FOR
+//             {
+//                 push_loop_block();
+//             }
+//             ;
+
 WHILE_COM   : WHILE EXP BLOCK
             {
                 string label_block = current_label();
@@ -113,6 +221,7 @@ WHILE_COM   : WHILE EXP BLOCK
                 $$.block = "\t" + label_block + ":\n" + $3.attributions + $3.translate + "\tgoto " + loop_stack.top().start_block + ";\n\n" + $3.block;
 
                 loop_stack.pop();
+                scope_variables.pop_back();
                 /*
                 LABEL_6:
             	tmp_25 = tmp_13 < tmp_1;
@@ -144,6 +253,9 @@ WHILE_COM   : WHILE EXP BLOCK
 WHILE      : TK_WHILE
             {
                 push_loop_block();
+
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
@@ -157,6 +269,7 @@ DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
                 $$.block = "\t" + label_block + ":\n" + $3.attributions + $3.translate + "\tgoto " + loop_stack.top().start_block + ";\n\n" + $3.block;
 
                 loop_stack.pop();
+                scope_variables.pop_back();
                 /*
                 LABEL_9:
             	goto LABEL_7;
@@ -195,6 +308,8 @@ DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
 REPEAT      : TK_REPEAT
             {
                 push_loop_block();
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
@@ -208,6 +323,7 @@ IF_COMMAND  : IF EXP BLOCK
                 $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $3.block;
 
                 conditional_return_stack.pop();
+                scope_variables.pop_back();
             }
             | IF EXP ':' COMMANDS ELSE_BLOCK
             {
@@ -219,6 +335,7 @@ IF_COMMAND  : IF EXP BLOCK
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
 
                 conditional_return_stack.pop();
+                scope_variables.pop_back();
             }
             | IF EXP ':' COMMANDS ELIF_BLOCK
             {
@@ -230,10 +347,11 @@ IF_COMMAND  : IF EXP BLOCK
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
 
                 conditional_return_stack.pop();
+                scope_variables.pop_back();
             }
             ;
 
-ELIF_BLOCK  : TK_ELIF EXP BLOCK
+ELIF_BLOCK  : ELIF EXP BLOCK
             {
                 string block_label = current_label();
 
@@ -241,16 +359,20 @@ ELIF_BLOCK  : TK_ELIF EXP BLOCK
                 $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ";\n";
 
                 $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $3.block;
+
+                scope_variables.pop_back();
             }
-            | TK_ELIF EXP ':' COMMANDS ELIF_BLOCK
+            | ELIF EXP ':' COMMANDS ELIF_BLOCK
             {
                 string block_label = current_label();
 
                 $$.attributions = $2.attributions + $5.attributions;
                 $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+
+                scope_variables.pop_back();
             }
-            | TK_ELIF EXP ':' COMMANDS ELSE_BLOCK
+            | ELIF EXP ':' COMMANDS ELSE_BLOCK
             {
                 string block_label = current_label();
 
@@ -258,10 +380,12 @@ ELIF_BLOCK  : TK_ELIF EXP BLOCK
                 $$.translate = $2.translate + "\tif(" + $2.temp + ") goto " + block_label + ";\n" + $5.translate;
 
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+
+                scope_variables.pop_back();
             }
             ;
 
-ELSE_BLOCK  : TK_ELSE BLOCK
+ELSE_BLOCK  : ELSE BLOCK
             {
                 string block_label = current_label();
 
@@ -270,12 +394,30 @@ ELSE_BLOCK  : TK_ELSE BLOCK
 
                 $$.block = "\t" + block_label + ":\n" + $2.attributions + $2.translate
                             + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $2.block;
+
+                scope_variables.pop_back();
             }
             ;
 
 IF          : TK_IF
             {
                 conditional_return_stack.push(current_label());
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
+            }
+            ;
+
+ELIF        : TK_ELIF
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
+            }
+            ;
+
+ELSE        : TK_ELSE
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
@@ -291,10 +433,11 @@ SWITCH_COM  : SWITCH PRIMITIVE ':' '\n' CASE
 
                 switch_temp.pop();
                 conditional_return_stack.pop();
+                scope_variables.pop_back();
             }
             ;
 
-CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
+CASE        : S_CASE PRIMITIVE ':' COMMANDS TK_END
             {
                 string block_label = current_label();
 
@@ -305,8 +448,10 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
                 $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
 
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $4.block;
+
+                scope_variables.pop_back();
             }
-            | TK_CASE PRIMITIVE ':' COMMANDS CASE
+            | S_CASE PRIMITIVE ':' COMMANDS CASE
             {
                 string block_label = current_label();
 
@@ -317,8 +462,10 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
                 $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n" + $5.translate;
 
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + $4.block;
+
+                scope_variables.pop_back();
             }
-            | TK_CASE PRIMITIVE ':' COMMANDS DEFAULT
+            | S_CASE PRIMITIVE ':' COMMANDS DEFAULT
             {
                 string block_label = current_label();
 
@@ -329,10 +476,12 @@ CASE        : TK_CASE PRIMITIVE ':' COMMANDS TK_END
                 $$.translate = $2.translate + "\t" + $$.temp + " = " + variable[switch_temp.top()].tmp + " == " + $2.temp + ";\n\tif(" + $$.temp + ") goto " + block_label + ";\n" + $5.translate;
 
                 $$.block = "\t" + block_label + ":\n" + $4.attributions + $4.translate + "\tgoto " + conditional_return_stack.top() + ";\n\n" + $5.block + "\n" + $4.block;
+
+                scope_variables.pop_back();
             }
             ;
 
-DEFAULT     : TK_DEFAULT ':' COMMANDS TK_END
+DEFAULT     : S_DEFAULT ':' COMMANDS TK_END
             {
                 string block_label = current_label();
 
@@ -342,11 +491,30 @@ DEFAULT     : TK_DEFAULT ':' COMMANDS TK_END
                 $$.translate = "\tgoto " + block_label + ";\n\t" + conditional_return_stack.top() + ":\n";
 
                 $$.block = "\t" + block_label + ":\n" + $3.attributions + $3.translate + "\tgoto " + conditional_return_stack.top() + ";\n" + $3.block;
+
+                scope_variables.pop_back();
+            }
+            ;
+
+S_DEFAULT   : TK_DEFAULT
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
+            }
+            ;
+
+S_CASE      : TK_CASE
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
 SWITCH      : TK_SWITCH
             {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
+
                 string current_var = current_exp();
                 set_variable(current_var, "undefined");
                 switch_temp.push(current_var);
@@ -414,8 +582,8 @@ COMMAND     : EXP '\n'
             }
             | TK_OUT_LINE TK_SHIFT_LEFT EXP '\n'
             {
-                $$.attributions = "";
-                $$.translate = "\tcout << " + $3.temp + " << endl;\n";
+                $$.attributions = $3.attributions;
+                $$.translate = $3.translate + "\tcout << " + $3.temp + " << endl;\n";
                 $$.block = "";
             }
             | TK_BREAK '\n'

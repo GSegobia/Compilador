@@ -9,6 +9,70 @@ bool validate_type(string type){
     exit(EXIT_FAILURE);
 }
 
+void add_arg(string type, string var){
+
+    validate_type(type);
+
+    current_function.args.push_back(var);
+    current_function.args_types.push_back(type);
+
+    return;
+}
+
+string current_arg(){
+
+    static unsigned long arg_number = 0;
+
+    string arg = "arg_" + to_string(arg_number);
+
+    arg_number++;
+
+    return arg;
+}
+
+string current_func(){
+
+    static unsigned long fun_number = 0;
+
+    string func = "func_" + to_string(fun_number);
+
+    fun_number++;
+
+    return func;
+}
+
+void clear_current_function(){
+
+    current_function.name = "";
+    current_function.type = "";
+    current_function.args.clear();
+    current_function.args_types.clear();
+    current_function.ordered_args_types.clear();
+}
+
+META_FUNC add_function(string type, string name){
+
+    validate_type(type);
+
+    current_function.ordered_args_types = current_function.args_types;
+    sort(current_function.ordered_args_types.begin(), current_function.ordered_args_types.end());
+
+    for(auto i : functions_list){
+
+        if(i.name == current_function.name && i.type == current_function.type && i.ordered_args_types == current_function.ordered_args_types){
+
+            cout << "Function " << i.type << "::" << i.name << " yet declared." << endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    functions_list.push_back(current_function);
+
+    clear_current_function();
+
+    return functions_list.back();
+}
+
 string get_type(string type){
 
     validate_type(type);
@@ -41,6 +105,45 @@ string current_temp(){
 string set_variable(string var_name, string var_type){
 
     validate_type(var_type);
+
+    if(scope_variables.back().count(var_name) > 0){
+
+        cout << "Variable " << var_name << " yet declared on this scope." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    META_VAR var_aux;
+
+    var_aux.type = get_type(var_type);
+    var_aux.tmp = current_temp();
+
+    scope_variables.back().insert(pair<string, META_VAR>(var_name, var_aux));
+
+    return var_aux.tmp;
+}
+
+META_VAR get_variable(string var_name){
+
+    for(auto i = scope_variables.rbegin(); i != scope_variables.rend(); i++){
+
+        auto j = *i;
+        if(j.count(var_name) > 0){
+            return j[var_name];
+        }
+    }
+
+    if(variable.count(var_name) == 0){
+
+        cout << "Variable " << var_name << " not declared." << endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+/*
+//Será alterada devido a escopo
+string set_variable(string var_name, string var_type){
+
+    validate_type(var_type);
     META_VAR var_aux;
 
     if(variable.count(var_name) > 0){
@@ -56,7 +159,7 @@ string set_variable(string var_name, string var_type){
     return var_aux.tmp;
 }
 
-//unifica 01
+//será alterada devido a escopo
 META_VAR get_variable(string var_name){
 
     if(variable.count(var_name) == 0){
@@ -69,7 +172,7 @@ META_VAR get_variable(string var_name){
 
     return var_aux;
 }
-
+*/
 /*
   Converte boolean(true ou false) para valor aceito no código intermediário(0 ou 1)
 */

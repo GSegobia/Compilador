@@ -1,60 +1,12 @@
 start:
-    number a = 10
-    number b = 20
-    number c = 30
-    number d = 40
-    number e = 1 + 1
-    number i = 0
-    bool h = true
+    number b = 309
 
-    string first_name = "Gabriel"
-    string last_name = 'Segobia'
-
-    outl << first_name
-    outl << last_name
-
-    number u = b++
-
-    if a > b:
-        outl << a
-    elif b < c:
-        outl << b
-    elif c > d:
-        outl << c
+    if b == 7:
+        number a = 10
+    elif b == 30:
+        number a = 20
     else:
-        outl << d
-    end
-
-    while i < a:
-        i = i + 1
-        outl << i
-
-        if i == 5:
-            break
-        end
-    end
-
-    repeat:
-
-        if a == 15:
-            outl << a
-            a++
-            continue
-        end
-
-        a = a + 1
-        outl << a
-    until a < b
-
-    a = 10
-
-    switch a:
-        case 10:
-            a = 50
-        case 20:
-            a = 100
-        default:
-            a = 200
+        number a = 5
     end
 
     outl << a
