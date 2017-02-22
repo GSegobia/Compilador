@@ -163,10 +163,10 @@ FUNCTION    : FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
             {
                 validate_return_type($2.translate);
 
-                META_FUNC aux = add_function($2.translate, $4.label);
+                add_function($2.translate, $4.label);
 
                 $$.type = $2.translate;
-                $$.temp = current_func();
+                $$.temp = functions_list.back().tmp_name;
                 $$.attributions = "";
                 $$.translate = get_type($$.type) + " " + $$.temp + "(" + $6.attributions + "){\n" + $8.attributions + "\n" + $8.translate +  "\n" + $8.block + "}\n";
                 $$.block = "";
@@ -178,10 +178,10 @@ FUNCTION    : FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
                 {
                     validate_return_type("void");
 
-                    META_FUNC aux = add_function("void", $2.label);
+                    add_function("void", $2.label);
 
                     $$.type = "void";
-                    $$.temp = current_func();
+                    $$.temp = functions_list.back().tmp_name;
                     $$.attributions = "";
                     $$.translate = get_type($$.type) + " " + $$.temp + "(" + $4.attributions + "){\n" + $6.attributions + "\n" + $6.translate +  "\n\treturn;\n\n" + $6.block + "}\n";
                     $$.block = "";
@@ -582,6 +582,60 @@ SWITCH      : TK_SWITCH
             }
             ;
 
+FUNC_CALL   : FUNC_NAME '(' FUNC_ARGS ')' '\n'
+            {
+                META_FUNC aux;
+                aux = get_function($1.label);
+
+                $$.type = aux.type;
+                $$.temp = aux.tmp_name;
+                $$.attributions = $3.attributions;
+                $$.translate = $3.translate + "\t" + $$.temp + "(" + $3.temp + ");\n";
+
+                clear_args_function();
+                scope_variables.pop_back();
+            }
+            ;
+
+FUNC_NAME   : TK_ID
+            {
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
+
+                $$.label = $1.label;
+            }
+            ;
+
+FUNC_ARGS   : FUNC_ARG
+            {
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+            }
+            | FUNC_ARG ',' FUNC_ARGS
+            {
+                $$.temp = $1.temp + ", " + $3.temp;
+                $$.attributions = $1.attributions + $3.attributions;
+                $$.translate = $1.translate + $3.translate;
+            }
+            |
+            {
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = "";
+            }
+            ;
+
+FUNC_ARG    : EXP
+            {
+                stack_arg_functions.push_back($1.type);
+
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+            }
+            ;
+
 COMMANDS    : COMMAND COMMANDS
             {
                 $$.attributions = $1.attributions + $2.attributions;
@@ -673,6 +727,14 @@ COMMAND     : EXP '\n'
 
                 $$.attributions = "";
                 $$.translate = "\treturn;\n";
+                $$.block = "";
+            }
+            | FUNC_CALL
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
                 $$.block = "";
             }
             ;

@@ -50,7 +50,7 @@ void clear_current_function(){
     current_function.ordered_args_types.clear();
 }
 
-META_FUNC add_function(string type, string name){
+void add_function(string type, string name){
 
     validate_type(type);
 
@@ -59,14 +59,25 @@ META_FUNC add_function(string type, string name){
 
     current_function.name = name;
     current_function.type = type;
+    current_function.tmp_name = current_func();
     current_function.ordered_args_types = current_function.args_types;
     sort(current_function.ordered_args_types.begin(), current_function.ordered_args_types.end());
 
+    cout << endl << current_function.tmp_name <<  ":" << endl;
+
+    for(auto i : current_function.args_types)
+        cout << i << endl;
+
+    cout << endl;
+
     for(auto i : functions_list){
 
-        if(i.name == current_function.name && i.type == current_function.type && i.ordered_args_types == current_function.ordered_args_types){
+        if(i.name == current_function.name && i.ordered_args_types == current_function.ordered_args_types){
 
-            cout << "Function " << i.type << "::" << i.name << " yet declared." << endl;
+            cout << "Function " << i.name << "(";
+            for(auto j =  i.args_types.rbegin(); j != i.args_types.rend(); j++)
+                cout << *j << " ";
+            cout << ") yet declared." << endl;
             exit(EXIT_FAILURE);
         }
     }
@@ -74,8 +85,30 @@ META_FUNC add_function(string type, string name){
     functions_list.push_back(current_function);
 
     clear_current_function();
+}
 
-    return functions_list.back();
+META_FUNC get_function(string name){
+
+    for(auto i : functions_list){
+
+        if(i.name == name && i.args_types == stack_arg_functions){
+            cout << i.type << " " << i.name << endl;
+            return i;
+        }
+    }
+
+    cout << "Function " << name << "(";
+    for(auto j =  stack_arg_functions.rbegin(); j != stack_arg_functions.rend(); j++)
+        cout << *j << " ";
+    cout << ") not declared." << endl;
+    exit(EXIT_FAILURE);
+}
+
+void clear_args_function(){
+
+    while(!stack_arg_functions.empty()){
+        stack_arg_functions.pop_back();
+    }
 }
 
 string get_type(string type){

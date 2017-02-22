@@ -23,6 +23,7 @@ struct META_VAR{
 struct META_FUNC{
 
     string name;
+    string tmp_name;
     string type;
     vector<string> args;
     vector<string> args_types;
@@ -106,4 +107,5 @@ META_FUNC current_function;
 map<string, META_VAR> global_scope;
 vector<map<string, META_VAR>> scope_variables = {global_scope};
 stack<string> return_types;
+vector<string> stack_arg_functions;
 bool isFunction = false;

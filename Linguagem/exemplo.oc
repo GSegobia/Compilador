@@ -1,7 +1,7 @@
 
 
 
-function func(bool a, bool b):
+function number::funct(number a, number b):
     number c = 5
 
     if b:
@@ -9,6 +9,8 @@ function func(bool a, bool b):
     end
 
     outl << c
+
+    return c
 end
 
 
@@ -24,6 +26,8 @@ start:
     number b = 100
 
     number a = 200
+
+    func(false, true)
 
     if a > b:
         outl << b
