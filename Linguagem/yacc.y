@@ -24,7 +24,7 @@ void yyerror(string);
 %}
 
 %token TK_START TK_END
-%token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER TK_NUMBER_TYPE TK_ID
+%token TK_TYPE TK_DYNAMIC_TYPE TK_NUMBER_TYPE TK_ID
 %token TK_IF TK_ELIF TK_ELSE
 %token TK_PLUS_PLUS TK_MINUS_MINUS
 %token TK_WHILE TK_REPEAT TK_UNTIL TK_FOR
@@ -36,7 +36,7 @@ void yyerror(string);
 %token TK_RELAT TK_NOT_EQUALS_RELAT TK_EQUALS_RELAT
 %token TK_PLUS_EQUAL TK_MINUS_EQUAL TK_MULTIPLIES_EQUAL TK_DIVIDES_EQUAL
 %token TK_DOUBLE_COLON TK_SHIFT_LEFT TK_SHIFT_RIGHT
-%token TK_FUNCTION
+%token TK_FUNCTION TK_RETURN
 
 %start S
 
@@ -85,7 +85,7 @@ S           : MAIN
                 cout << "Conditional Return Stack Size: " << conditional_return_stack.size() << endl;
                 cout << "Switch Variable Size: " << switch_temp.size() << endl;
             }
-            | FUNCTION MAIN
+            | FUNCTIONS MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
@@ -125,52 +125,111 @@ S           : MAIN
                 cout << "Switch Variable Size: " << switch_temp.size() << endl;
             }
             ;
-
-FUNCTION    : FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ')' BLOCK
+FUNCTIONS   : FUNCTION
             {
-                //META_FUNC aux = add_function($2.translate, $4.label);
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+                $$.block = $1.block;
+            }
+            | FUNCTION FUNCTIONS
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate + $2.translate;
+                $$.block = $1.block;
+            }
+            | '\n' FUNCTIONS
+            {
+                $$.type = $2.type;
+                $$.temp = $2.temp;
+                $$.attributions = $2.attributions;
+                $$.translate = $2.translate;
+                $$.block = $2.block;
+            }
+            | '\n'
+            {
+                $$.type = "";
+                $$.temp = "";
+                $$.attributions = "";
+                $$.translate = "";
+                $$.block = "";
+            }
+            ;
+
+FUNCTION    : FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
+            {
+                validate_return_type($2.translate);
+
+                META_FUNC aux = add_function($2.translate, $4.label);
 
                 $$.type = $2.translate;
                 $$.temp = current_func();
                 $$.attributions = "";
-                $$.translate = get_type($$.type) + " " + $$.temp + "(){\n" + $7.attributions + "\n" + $7.translate + "}\n";
+                $$.translate = get_type($$.type) + " " + $$.temp + "(" + $6.attributions + "){\n" + $8.attributions + "\n" + $8.translate +  "\n" + $8.block + "}\n";
+                $$.block = "";
 
+                isFunction = false;
+                scope_variables.pop_back();
             }
+            | FUNC TK_ID '(' ARGS ')' BLOCK
+                {
+                    validate_return_type("void");
+
+                    META_FUNC aux = add_function("void", $2.label);
+
+                    $$.type = "void";
+                    $$.temp = current_func();
+                    $$.attributions = "";
+                    $$.translate = get_type($$.type) + " " + $$.temp + "(" + $4.attributions + "){\n" + $6.attributions + "\n" + $6.translate +  "\n\treturn;\n\n" + $6.block + "}\n";
+                    $$.block = "";
+
+                    isFunction = false;
+                    scope_variables.pop_back();
+                }
             ;
 
 FUNC        : TK_FUNCTION
             {
-
+                isFunction = true;
+                map<string, META_VAR> current_scope;
+                scope_variables.push_back(current_scope);
             }
             ;
 
-// ARGS        : ARG
-//             {
-//                 $$.type = $1.translate;
-//                 $$.temp = $1.temp;
-//             }
-//             | TK_TYPE TK_ID ',' ARGS
-//             {
-//                 add_arg($1.translate, $2.label);
-//
-//                 $$.type = $1.translate + $4.translate;
-//                 $$.temp = $2.label + $4.label;
-//             }
-//             |
-//             {
-//                 $$.type = "";
-//                 $$.temp = "";
-//             }
-//             ;
-//
-// ARG         : TK_TYPE TK_ID
-//             {
-//                 add_arg($1.translate, $2.label);
-//
-//                 $$.type = $1.translate;
-//                 $$.temp = $2.label;
-//             }
-//             ;
+ARGS        : ARG
+            {
+                $$.type = $1.translate;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+            }
+            | TK_TYPE TK_ID ',' ARGS
+            {
+                add_arg($1.translate, $2.label);
+
+                $$.type = $1.translate;
+                $$.temp = set_variable($2.label, $1.translate);
+                $$.attributions = get_type($$.type) + " " + $$.temp + ", " + $4.attributions;
+            }
+            |
+            {
+                $$.type = "";
+                $$.temp = "";
+                $$.attributions = "";
+            }
+            ;
+
+ARG         : TK_TYPE TK_ID
+            {
+                add_arg($1.translate, $2.label);
+
+                $$.type = $1.translate;
+                $$.temp = set_variable($2.label, $1.translate);
+                $$.attributions = get_type($$.type) + " " + $$.temp;
+            }
+            ;
 
 MAIN        : MAIN_INIT BLOCK
             {
@@ -598,6 +657,24 @@ COMMAND     : EXP '\n'
                 $$.translate = continue_to();
                 $$.block = "";
             }
+            | TK_RETURN EXP '\n'
+            {
+                validate_function();
+                return_types.push($2.type);
+
+                $$.attributions = $2.attributions;
+                $$.translate = $2.translate + "\treturn " + $2.temp + ";\n";
+                $$.block = "";
+            }
+            | TK_RETURN '\n'
+            {
+                validate_function();
+                return_types.push("void");
+
+                $$.attributions = "";
+                $$.translate = "\treturn;\n";
+                $$.block = "";
+            }
             ;
 
 ATTR        : TK_TYPE TK_ID
@@ -607,23 +684,9 @@ ATTR        : TK_TYPE TK_ID
                 $$.attributions = '\t' + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "";
             }
-            | TK_NUMBER TK_ID
-            {
-                $$.type = get_type($1.translate);
-                $$.temp = set_variable($2.label, $$.type);
-                $$.attributions = '\t' + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = "";
-            }
             | TK_TYPE TK_ID '=' EXP
             {
                 $$.type = $1.translate;
-                $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = $4.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $4.translate + '\t' + $$.temp + " = " + $4.temp + ";\n";
-            }
-            | TK_NUMBER TK_ID '=' EXP
-            {
-                $$.type = get_type($1.translate);
                 $$.temp = set_variable($2.label, $1.translate);
                 $$.attributions = $4.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $4.translate + '\t' + $$.temp + " = " + $4.temp + ";\n";
@@ -639,7 +702,7 @@ ATTR        : TK_TYPE TK_ID
 
 EXP         : EXP '+' EXP
             {
-                $$.type = get_type(get_operation_type($1.type, $3.type, "+"));
+                $$.type = get_operation_type($1.type, $3.type, "+");
                 cout << $$.type << endl;
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
@@ -647,28 +710,28 @@ EXP         : EXP '+' EXP
             }
             | EXP '-' EXP
             {
-                $$.type = get_type(get_operation_type($1.type, $3.type, "-"));
+                $$.type = get_operation_type($1.type, $3.type, "-");
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " - " + $3.temp + ";\n";
             }
             | EXP '*' EXP
             {
-                $$.type = get_type(get_operation_type($1.type, $3.type, "*"));
+                $$.type = get_operation_type($1.type, $3.type, "*");
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " * " + $3.temp + ";\n";
             }
             | EXP '/' EXP
             {
-                $$.type = get_type(get_operation_type($1.type, $3.type, "/"));
+                $$.type = get_operation_type($1.type, $3.type, "/");
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " / " + $3.temp + ";\n";
             }
             | EXP '%' EXP
             {
-                $$.type = get_type(get_operation_type($1.type, $3.type, "%"));
+                $$.type = get_operation_type($1.type, $3.type, "%");
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " % " + $3.temp + ";\n";
@@ -737,21 +800,21 @@ UNARY_EXP   : VARIABLE TK_PLUS_PLUS
 
 PRIMITIVE   : TK_REAL
             {
-                $$.type = "float64";
+                $$.type = "number";
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + $1.translate + ";\n";
             }
             | '-' TK_REAL
             {
-                $$.type = "float64";
+                $$.type = "number";
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = -" + $2.translate + ";\n";
             }
             | '+' TK_REAL
             {
-                $$.type = "float64";
+                $$.type = "number";
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + $2.translate + ";\n";

@@ -59,13 +59,9 @@ map<string,string> type_value = {
                                     };
 
 map<string, string> types_map = {
-                                              {"number", "float64"},
                                               {"undefined", "undefined"},
-                                              {"float64", "double"},
-                                              {"float32", "float"},
-                                              {"int64", "long int"},
-                                              {"int32", "int"},
-                                              {"int16", "short int"},
+                                              {"number", "double"},
+                                              {"void", "void"},
                                               {"string", "char* "},
                                               {"char", "char"},
                                               {"bool", "int"}
@@ -97,8 +93,8 @@ map<string, string> op_type = {
                               };
 
 map<string, string> unary_op_type = {
-                                        {"++", "float64"},
-                                        {"--", "float64"},
+                                        {"++", "number"},
+                                        {"--", "number"},
                                         {"not", "bool"}
                                     };
 
@@ -107,6 +103,7 @@ stack<string> conditional_return_stack;
 stack<string> switch_temp;
 vector<META_FUNC> functions_list;
 META_FUNC current_function;
-
 map<string, META_VAR> global_scope;
 vector<map<string, META_VAR>> scope_variables = {global_scope};
+stack<string> return_types;
+bool isFunction = false;

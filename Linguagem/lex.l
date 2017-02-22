@@ -27,8 +27,7 @@ ID {LETTER}({LETTER}|{NUM})*
 
 "var"       {yylval.translate = yytext; return TK_DYNAMIC_TYPE;}
 
-"number"    {yylval.translate = yytext; return TK_NUMBER;}
-
+"number"    {yylval.translate = yytext; return TK_TYPE;}
 "char"		{yylval.translate = yytext; return TK_TYPE;}
 "bool"		{yylval.translate = yytext; return TK_TYPE;}
 "string"    {yylval.translate = yytext; return TK_TYPE;}
@@ -63,6 +62,7 @@ ID {LETTER}({LETTER}|{NUM})*
 "in"        {yylval.translate = yytext; return TK_IN;}
 
 "function"  {yylval.translate = yytext; return TK_FUNCTION;}
+"return"    {yylval.translate = yytext; return TK_RETURN;}
 
 "::"        {yylval.translate = yytext; return TK_DOUBLE_COLON;}
 "<<"        {yylval.translate = yytext; return TK_SHIFT_LEFT;}

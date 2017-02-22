@@ -39,8 +39,8 @@ Projeto da Linguagem Ocean para a disciplina Compiladores no período 2016.2 des
 ## Entrega 2
 
   - [x] Bloco
-  - [ ] Contexto
-  - [ ] Escopo Global
+  - [x] Contexto
+  - [x] Escopo Global
   - [x] String
   - [ ] Comandos de Entrada e Saída
 

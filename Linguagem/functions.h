@@ -54,6 +54,11 @@ META_FUNC add_function(string type, string name){
 
     validate_type(type);
 
+    cout << type << endl;
+    cout << name << endl;
+
+    current_function.name = name;
+    current_function.type = type;
     current_function.ordered_args_types = current_function.args_types;
     sort(current_function.ordered_args_types.begin(), current_function.ordered_args_types.end());
 
@@ -114,7 +119,7 @@ string set_variable(string var_name, string var_type){
 
     META_VAR var_aux;
 
-    var_aux.type = get_type(var_type);
+    var_aux.type = var_type;
     var_aux.tmp = current_temp();
 
     scope_variables.back().insert(pair<string, META_VAR>(var_name, var_aux));
@@ -137,6 +142,36 @@ META_VAR get_variable(string var_name){
         cout << "Variable " << var_name << " not declared." << endl;
         exit(EXIT_FAILURE);
     }
+}
+
+void validate_function(){
+
+    if(isFunction)
+        return;
+
+    cout << "Command return cannot be called out of a function." << endl;
+    exit(EXIT_FAILURE);
+}
+
+void validate_return_type(string type){
+
+    if(return_types.empty() && type != "void"){
+
+        cout << "A function with type " << type << " must return one " << type << " value." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    while(!return_types.empty()){
+        if(return_types.top() != type){
+
+            cout << "Functions with type " << type << " can not return type " << return_types.top() << "." << endl;
+            exit(EXIT_FAILURE);
+        }
+
+        return_types.pop();
+    }
+
+    return;
 }
 
 /*

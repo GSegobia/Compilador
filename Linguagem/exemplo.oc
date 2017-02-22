@@ -1,13 +1,35 @@
-start:
-    number b = 309
 
-    if b == 7:
-        number a = 10
-    elif b == 30:
-        number a = 20
-    else:
-        number a = 5
+
+
+function func(bool a, bool b):
+    number c = 5
+
+    if b:
+        c = 10
     end
+
+    outl << c
+end
+
+
+
+function func(bool a, bool b):
+    number d = 7
+
+    outl << d
+end
+
+
+start:
+    number b = 100
+
+    number a = 200
+
+    if a > b:
+        outl << b
+    end
+
+    number c = a + b
 
     outl << a
 end
