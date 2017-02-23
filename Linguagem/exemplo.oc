@@ -27,6 +27,9 @@ start:
 
     number a = 200
 
+    number d[5]
+    number e[10][20]
+
     func(false, true)
 
     if a > b:

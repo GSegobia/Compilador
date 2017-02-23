@@ -62,10 +62,12 @@ map<string,string> type_value = {
 map<string, string> types_map = {
                                               {"undefined", "undefined"},
                                               {"number", "double"},
+                                              {"number*", "double*"},
                                               {"void", "void"},
-                                              {"string", "char* "},
+                                              {"string", "char*"},
                                               {"char", "char"},
-                                              {"bool", "int"}
+                                              {"bool", "int"},
+                                              {"bool*", "int*"}
                                         };
 
 map<string, list<string>> implicit_cast = {

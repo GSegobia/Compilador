@@ -51,7 +51,7 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\n#include <cstdlib>\n\nusing namespace std;\n\n";
                     compiled << "int main(){\n";
                     compiled << $1.attributions;
                     compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
@@ -89,7 +89,7 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <cstdlib>\n\nusing namespace std;\n\n";
                     compiled << $1.translate;
                     compiled << "\nint main(){\n";
                     compiled << $2.attributions;
@@ -759,6 +759,28 @@ ATTR        : TK_TYPE TK_ID
                 $$.temp = get_variable($1.label).tmp;
                 $$.attributions = $3.attributions;
                 $$.translate = $3.translate + '\t' + $$.temp + " = " + $3.temp + ";\n";
+            }
+            | TK_TYPE TK_ID DIM
+            {
+                $$.type = $1.translate + "*";
+                $$.temp = set_variable($2.label, $1.translate);
+                $$.attributions = $3.attributions + "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $3.translate + "\tline_" + $$.temp + " = " + $3.temp + ";\n\tcolumn_" + $$.temp + " = 1;\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc((int)" + $3.temp + ", " + "sizeof(" + get_type($1.translate) + "));\n";
+            }
+            | TK_TYPE TK_ID DIM DIM
+            {
+                $$.type = $1.translate + "*";
+                $$.temp = set_variable($2.label, $1.translate);
+                $$.attributions = $3.attributions + $4.attributions + "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = $3.translate + $4.translate + "\tline_" + $$.temp + " = " + $3.temp + ";\n\tcolumn_" + $$.temp + " = " + $4.temp + ";\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc(((int)" + $3.temp + ")*((int)" + $4.temp + "), " + "sizeof(" + get_type($1.translate) + "));\n";
+            }
+            ;
+
+DIM        : '[' PRIMITIVE ']'
+            {
+                $$.temp = $2.temp;
+                $$.attributions = $2.attributions;
+                $$.translate = $2.translate;
             }
             ;
 
