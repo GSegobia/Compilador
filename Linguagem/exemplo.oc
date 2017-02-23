@@ -8,7 +8,7 @@ function number::funct(number a, number b):
         c = 10
     end
 
-    outl << c
+    outl :: c
 
     return c
 end
@@ -18,25 +18,15 @@ end
 function func(bool a, bool b):
     number d = 7
 
-    outl << d
+    outl :: d
 end
 
 
 start:
-    number b = 100
+    string a = 'Gabriel'
+    string b = "Segobia"
 
-    number a = 200
+    string c = a << " " << b
 
-    number d[5]
-    number e[10][20]
-
-    func(false, true)
-
-    if a > b:
-        outl << b
-    end
-
-    number c = a + b
-
-    outl << a
+    outl :: c
 end

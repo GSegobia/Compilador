@@ -51,7 +51,7 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\n#include <cstdlib>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\n#include <cstdlib>\n#include <cstring>\n\nusing namespace std;\n\n";
                     compiled << "int main(){\n";
                     compiled << $1.attributions;
                     compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
@@ -89,7 +89,7 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <cstdlib>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <cstdlib>\n#include <cstring>\n\nusing namespace std;\n\n";
                     compiled << $1.translate;
                     compiled << "\nint main(){\n";
                     compiled << $2.attributions;
@@ -693,7 +693,7 @@ COMMAND     : EXP '\n'
                 $$.translate = "";
                 $$.block = "";
             }
-            | TK_OUT_LINE TK_SHIFT_LEFT EXP '\n'
+            | TK_OUT_LINE TK_DOUBLE_COLON EXP '\n'
             {
                 $$.attributions = $3.attributions;
                 $$.translate = $3.translate + "\tcout << " + $3.temp + " << endl;\n";
@@ -743,51 +743,110 @@ ATTR        : TK_TYPE TK_ID
             {
                 $$.type = $1.translate;
                 $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = '\t' + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = "";
+                if($$.type == "string"){
+
+                    $$.attributions = "\tint length_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                    $$.translate = "";
+                }
+                else{
+
+                    $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                    $$.translate = "";
+                }
             }
             | TK_TYPE TK_ID '=' EXP
             {
                 $$.type = $1.translate;
                 $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = $4.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $4.translate + '\t' + $$.temp + " = " + $4.temp + ";\n";
+                if($$.type == "string"){
+                    $$.attributions = $4.attributions + "\tint length_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                    $$.translate = $4.translate + "\tlength_" + $$.temp + " = length_" + $4.temp + ";\n\t" + $$.temp + " = " + $4.temp + ";\n";
+                }
+                else{
+                    $$.attributions = $4.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                    $$.translate = $4.translate + '\t' + $$.temp + " = " + $4.temp + ";\n";
+                }
             }
             | TK_ID '=' EXP
             {
                 $$.type = get_variable($1.label).type;
                 $$.temp = get_variable($1.label).tmp;
-                $$.attributions = $3.attributions;
-                $$.translate = $3.translate + '\t' + $$.temp + " = " + $3.temp + ";\n";
+                if($$.type == "string"){
+                    $$.attributions = $3.attributions;
+                    $$.translate = $3.translate + "\tlength_" + $$.temp + " = length_" + $3.temp + ";\n\t" + $$.temp + " = " + $3.temp + ";\n";
+                }
+                else{
+                    $$.attributions = $3.attributions;
+                    $$.translate = $3.translate + '\t' + $$.temp + " = " + $3.temp + ";\n";
+                }
             }
-            | TK_TYPE TK_ID DIM
+            | TK_TYPE TK_ID '[' TK_REAL ']'
             {
                 $$.type = $1.translate + "*";
                 $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = $3.attributions + "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $3.translate + "\tline_" + $$.temp + " = " + $3.temp + ";\n\tcolumn_" + $$.temp + " = 1;\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc((int)" + $3.temp + ", " + "sizeof(" + get_type($1.translate) + "));\n";
+
+                $$.attributions = "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+
+                push_array($$.temp, $4.translate, "1", $1.translate);
+
+                $$.translate = "\tline_" + $$.temp + " = (int)" + $4.translate + ";\n\tcolumn_" + $$.temp + " = 1;\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc(line_" + $$.temp + ", " + "sizeof(" + get_type($1.translate) + "));\n";
             }
-            | TK_TYPE TK_ID DIM DIM
+            | TK_TYPE TK_ID '[' TK_REAL ',' TK_REAL ']'
             {
                 $$.type = $1.translate + "*";
                 $$.temp = set_variable($2.label, $1.translate);
-                $$.attributions = $3.attributions + $4.attributions + "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = $3.translate + $4.translate + "\tline_" + $$.temp + " = " + $3.temp + ";\n\tcolumn_" + $$.temp + " = " + $4.temp + ";\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc(((int)" + $3.temp + ")*((int)" + $4.temp + "), " + "sizeof(" + get_type($1.translate) + "));\n";
-            }
-            ;
 
-DIM        : '[' PRIMITIVE ']'
+                $$.attributions = "\tint line_" + $$.temp + ";\n\tint column_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+
+                push_array($$.temp, $4.translate, $6.translate, $1.translate);
+
+                $$.translate = "\tline_" + $$.temp + " = (int)" + $4.translate + ";\n\tcolumn_" + $$.temp + " = (int)" + $6.translate + ";\n\t" + $$.temp + " = (" + get_type($$.type) + ")calloc(line_" + $$.temp + " * column_" + $$.temp + ", " + "sizeof(" + get_type($1.translate) + "));\n";
+            }
+            | TK_ID '[' TK_REAL ']' '=' EXP
             {
-                $$.temp = $2.temp;
-                $$.attributions = $2.attributions;
-                $$.translate = $2.translate;
+                META_VAR var_aux = get_variable($1.label);
+                META_ARRAY aux = get_array(var_aux.tmp, $1.label);
+
+                int position = (int)stod($3.translate);
+
+                validate_array_range(aux.lines * aux.columns, $3.translate);
+
+                $$.type = var_aux.type;
+                $$.temp = var_aux.tmp;
+                $$.attributions = $6.attributions;
+                $$.translate = $6.translate + "\t" + $$.temp + "[" + to_string(position) + "] = " + $6.temp + ";\n";
+            }
+            | TK_ID '[' TK_REAL ',' TK_REAL ']' '=' EXP
+            {
+                META_VAR var_aux = get_variable($1.label);
+                META_ARRAY aux = get_array(var_aux.tmp, $1.label);
+
+                int line_position = (int)stod($3.translate);
+                int column_position = (int)stod($5.translate);
+
+                int linear_position = validate_multi_array_range(aux.lines, aux.columns, $3.translate, $5.translate);
+
+                $$.type = var_aux.type;
+                $$.temp = var_aux.tmp;
+                $$.attributions = $8.attributions;
+                $$.translate = $8.translate + "\t" + $$.temp + "[" + to_string(linear_position) + "] = " + $8.temp + ";\n";
             }
             ;
 
-EXP         : EXP '+' EXP
+EXP         : EXP TK_SHIFT_LEFT EXP
+            {
+                validate_string_concat($1.type, $3.type);
+
+                $$.type = "string";
+                $$.temp = set_variable(current_exp(), $$.type);
+
+                $$.attributions = $1.attributions + $3.attributions + "\tint length_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+
+                $$.translate = $1.translate + $3.translate + "\tlength_" + $$.temp + " = length_" + $1.temp + " + length_" + $3.temp + ";\n\t" + $$.temp + " = " + "(" + get_type($$.type) + ")malloc((length_" + $$.temp + " + 1)*sizeof(char));\n\tstrcat(" + $$.temp + ", " + $1.temp + ");\n\tstrcat(" + $$.temp + ", " + $3.temp + ");\n";
+            }
+            | EXP '+' EXP
             {
                 $$.type = get_operation_type($1.type, $3.type, "+");
-                cout << $$.type << endl;
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = " + $1.temp + " + " + $3.temp + ";\n";
@@ -863,6 +922,35 @@ EXP         : EXP '+' EXP
                 $$.attributions = $1.attributions;
                 $$.translate = $1.translate;
             }
+            | TK_ID '[' TK_REAL ']'
+            {
+                META_VAR var_aux = get_variable($1.label);
+                META_ARRAY aux = get_array(var_aux.tmp, $1.label);
+
+                int position = (int)stod($3.translate);
+
+                validate_array_range(aux.lines * aux.columns, $3.translate);
+
+                $$.type = aux.element_type;
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + var_aux.tmp + "[" + to_string(position) + "]" + ";\n";
+            }
+            | TK_ID '[' TK_REAL ',' TK_REAL ']'
+            {
+                META_VAR var_aux = get_variable($1.label);
+                META_ARRAY aux = get_array(var_aux.tmp, $1.label);
+
+                int line_position = (int)stod($3.translate);
+                int column_position = (int)stod($5.translate);
+
+                int linear_position = validate_multi_array_range(aux.lines, aux.columns, $3.translate, $5.translate);
+
+                $$.type = aux.element_type;
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\t" + $$.temp +" = " + var_aux.tmp + "[" + to_string(linear_position) + "]" + ";\n";
+            }
             ;
 
 UNARY_EXP   : VARIABLE TK_PLUS_PLUS
@@ -905,10 +993,12 @@ PRIMITIVE   : TK_REAL
             }
             | TK_STRING
             {
+                int string_length = $1.translate.substr(1, $1.translate.length() - 2).length();
+
                 $$.type = "string";
                 $$.temp = set_variable(current_exp(), $$.type);
-                $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
-                $$.translate = "\t" + $$.temp +" = (char*)\"" + $1.translate.substr(1, $1.translate.length() - 2) + "\";\n";
+                $$.attributions = "\tint length_" + $$.temp + ";\n\t" + get_type($$.type) + " " + $$.temp + ";\n";
+                $$.translate = "\tlength_" + $$.temp + " = " + to_string(string_length) + ";\n\t" + $$.temp +" = (char*)\"" + $1.translate.substr(1, $1.translate.length() - 2) + "\";\n";
             }
             | TK_CHAR
             {

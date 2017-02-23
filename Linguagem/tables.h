@@ -36,6 +36,13 @@ struct LABELS{
     string return_block;
 };
 
+struct META_ARRAY{
+
+    int lines;
+    int columns;
+    string element_type;
+};
+
 map<string, META_VAR> variable;
 
 string types[] = {"float", "int", "bool", "char", "number"};
@@ -110,4 +117,5 @@ map<string, META_VAR> global_scope;
 vector<map<string, META_VAR>> scope_variables = {global_scope};
 stack<string> return_types;
 vector<string> stack_arg_functions;
+map<string, META_ARRAY> array_map;
 bool isFunction = false;

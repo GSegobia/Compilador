@@ -19,6 +19,78 @@ void add_arg(string type, string var){
     return;
 }
 
+void push_array(string temp, string lines, string columns, string el_type){
+
+    int l = (int)stod(lines);
+    int c = (int)stod(columns);
+
+    META_ARRAY meta;
+
+    meta.lines = l;
+    meta.columns = c;
+    meta.element_type = el_type;
+
+    array_map.insert(pair<string, META_ARRAY>(temp, meta));
+
+    return;
+}
+
+META_ARRAY get_array(string temp, string name){
+
+    META_ARRAY meta;
+
+    if(array_map.count(temp) == 0){
+
+        cout << "Variable " << name << " is not an Array." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    meta = array_map[temp];
+
+    return meta;
+}
+
+int get_linear_multi_array_index(int number_columns, int lines, int columns){
+
+    return columns + number_columns * lines;
+}
+
+void validate_array_range(int range, string lines){
+
+    int range_aux = (int)stod(lines);
+
+    if(range_aux < range)
+        return;
+
+    cout << "Array out of range." << endl;
+    exit(EXIT_FAILURE);
+}
+
+void validate_string_concat(string type1, string type2){
+
+    validate_type(type1);
+    validate_type(type2);
+
+    if(type1 == "string" && type2 == "string")
+        return;
+
+    cout << "Unable to concat " << type1 << " with " << type2 << "." << endl;
+    exit(EXIT_FAILURE);
+}
+
+int validate_multi_array_range(int number_lines, int number_columns, string lines, string columns){
+
+    int lines_aux = (int)stod(lines);
+    int columns_aux = (int)stod(columns);
+    int linear_position = get_linear_multi_array_index(number_columns, lines_aux, columns_aux);
+
+    if(lines_aux < number_lines && columns_aux < number_columns)
+        return linear_position;
+
+    cout << "Array out of range." << endl;
+    exit(EXIT_FAILURE);
+}
+
 string current_arg(){
 
     static unsigned long arg_number = 0;
@@ -62,13 +134,6 @@ void add_function(string type, string name){
     current_function.tmp_name = current_func();
     current_function.ordered_args_types = current_function.args_types;
     sort(current_function.ordered_args_types.begin(), current_function.ordered_args_types.end());
-
-    cout << endl << current_function.tmp_name <<  ":" << endl;
-
-    for(auto i : current_function.args_types)
-        cout << i << endl;
-
-    cout << endl;
 
     for(auto i : functions_list){
 
