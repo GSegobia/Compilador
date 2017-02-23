@@ -209,6 +209,8 @@ string set_variable(string var_name, string var_type){
 
     validate_type(var_type);
 
+    cout << "Var name: " << var_name << endl;
+
     if(scope_variables.back().count(var_name) > 0){
 
         cout << "Variable " << var_name << " yet declared on this scope." << endl;

@@ -39,7 +39,6 @@ void yyerror(string);
 %token TK_FUNCTION TK_RETURN
 
 %start S
-
 %left '+' '-'
 %left '*' '/' '%'
 %left '^'
@@ -51,8 +50,10 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\n#include <cstdlib>\n#include <cstring>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n\n#include <cstdlib>\n#include <cstring>\n#include <cstdio>\n\nusing namespace std;\n\n";
+                    compiled << "#define BUFFER_SIZE 1000\n\n";
                     compiled << "int main(){\n";
+                    compiled << "\tchar* buffer;\n";
                     compiled << $1.attributions;
                     compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
                     compiled << $1.translate;
@@ -89,9 +90,11 @@ S           : MAIN
             {
                 ofstream compiled("compiled.cpp");
                 if(compiled.is_open()){
-                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <cstdlib>\n#include <cstring>\n\nusing namespace std;\n\n";
+                    compiled << "/*Cry me a Ocean*/\n\n#include <iostream>\n#include <cstdlib>\n#include <cstring>\n#include <cstdio>\n\nusing namespace std;\n\n";
+                    compiled << "#define BUFFER_SIZE 1000\n\n";
                     compiled << $1.translate;
                     compiled << "\nint main(){\n";
+                    compiled << "\tchar* buffer;\n";
                     compiled << $2.attributions;
                     compiled << "\n //---- FIM DAS ATRIBUIÇÕES ----\n\n";
                     compiled << $2.translate;
@@ -258,15 +261,31 @@ BLOCK       : ':' COMMANDS TK_END '\n'
             }
             ;
 
-// FOR_COM     : FOR PRIMITIVE
+// FOR_COM     : FOR TK_ID TK_IN '[' PRIMITIVE ':' PRIMITIVE ']' BLOCK
 //             {
+//                 string label_block = current_label();
 //
+//                 cout << "Nome Variável: "<< $2.label << endl;
+//
+//                 $$.type = "number";
+//                 $$.temp = set_variable($2.label, $$.type);
+//
+//                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
+//                 $$.translate = $$.temp + " = " + $5.temp + ";\n\t" + loop_stack.top().start_block + ":\n\t" + "if(" + $$.temp + " <= " + $7.temp + ") goto " + label_block + ";\n\t" + loop_stack.top().return_block + ":\n";;
+//
+//                 $$.block = "\t" + label_block + ":\n" + $9.attributions + $9.translate + "\tgoto " + loop_stack.top().start_block + ";\n\n" + $9.block;
+//
+//                 loop_stack.pop();
+//                 scope_variables.pop_back();
 //             }
 //             ;
 //
 // FOR         : TK_FOR
 //             {
 //                 push_loop_block();
+//
+//                 map<string, META_VAR> current_scope;
+//                 scope_variables.push_back(current_scope);
 //             }
 //             ;
 
@@ -484,6 +503,8 @@ SWITCH_COM  : SWITCH PRIMITIVE ':' '\n' CASE
             {
                 variable[switch_temp.top()].type = $2.type;
 
+                cout << "Variable switch: " << switch_temp.top() << endl;
+
                 $$.attributions = "\t" + get_type(variable[switch_temp.top()].type) + " " + variable[switch_temp.top()].tmp + ";//ATTRIBUTION SWITCH\n" + $5.attributions;
 
                 $$.translate = "\t" + variable[switch_temp.top()].tmp + " = " + $2.temp + ";//DECLARATION SWITCH\n" +   $5.translate;
@@ -577,6 +598,7 @@ SWITCH      : TK_SWITCH
                 string current_var = current_exp();
                 set_variable(current_var, "undefined");
                 switch_temp.push(current_var);
+                variable[switch_temp.top()].tmp = current_temp();
 
                 conditional_return_stack.push(current_label());
             }
@@ -588,9 +610,9 @@ FUNC_CALL   : FUNC_NAME '(' FUNC_ARGS ')' '\n'
                 aux = get_function($1.label);
 
                 $$.type = aux.type;
-                $$.temp = aux.tmp_name;
-                $$.attributions = $3.attributions;
-                $$.translate = $3.translate + "\t" + $$.temp + "(" + $3.temp + ");\n";
+                $$.temp = set_variable(current_exp(), $$.type);
+                $$.attributions = $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";";
+                $$.translate = $3.translate + "\t" + $$.temp + " = " + aux.tmp_name + "(" + $3.temp + ");\n";
 
                 clear_args_function();
                 scope_variables.pop_back();
@@ -675,6 +697,13 @@ COMMAND     : EXP '\n'
                 $$.translate = $1.translate;
                 $$.block = $1.block;
             }
+            // | FOR_COM
+            // {
+            //     cout << "FOR TEMP: " << $1.label << endl;
+            //     $$.attributions = $1.attributions;
+            //     $$.translate = $1.translate;
+            //     $$.block = $1.block;
+            // }
             | DO_WHILE_COM
             {
                 $$.attributions = $1.attributions;
@@ -698,6 +727,35 @@ COMMAND     : EXP '\n'
                 $$.attributions = $3.attributions;
                 $$.translate = $3.translate + "\tcout << " + $3.temp + " << endl;\n";
                 $$.block = "";
+            }
+            | TK_OUT TK_DOUBLE_COLON EXP '\n'
+            {
+                $$.attributions = $3.attributions;
+                $$.translate = $3.translate + "\tcout << " + $3.temp + ";\n";
+                $$.block = "";
+            }
+            | TK_IN TK_DOUBLE_COLON TK_ID '\n'
+            {
+                META_VAR aux = get_variable($3.label);
+
+                if(aux.type != "string" && aux.type != "number" && aux.type != "bool"){
+
+                    cout << "Command in doesn't work with array, deal with it!" << endl;
+                    exit(EXIT_FAILURE);
+                }
+
+                if(aux.type == "string"){
+
+                    $$.attributions = "";
+                    $$.translate = "\tbuffer = (char*)malloc(BUFFER_SIZE * sizeof(char));\n\tfgets(buffer, BUFFER_SIZE, stdin);\n\tlength_" + aux.tmp + " = " + "strlen(buffer);\n\tbuffer[strlen(buffer) - 1] = 0;\n\t" + aux.tmp + " = (char *)malloc((length_" + aux.tmp + " + 1) * sizeof(char));\n\tstrcpy(" + aux.tmp + ", buffer);\n\tfree(buffer);\n";
+                    $$.block = "";
+                }
+                else{
+
+                    $$.attributions = "";
+                    $$.translate = "\tcin >> " + aux.tmp + ";\n";
+                    $$.block = "";
+                }
             }
             | TK_BREAK '\n'
             {
@@ -727,14 +785,6 @@ COMMAND     : EXP '\n'
 
                 $$.attributions = "";
                 $$.translate = "\treturn;\n";
-                $$.block = "";
-            }
-            | FUNC_CALL
-            {
-                $$.type = $1.type;
-                $$.temp = $1.temp;
-                $$.attributions = $1.attributions;
-                $$.translate = $1.translate;
                 $$.block = "";
             }
             ;
@@ -881,7 +931,7 @@ EXP         : EXP TK_SHIFT_LEFT EXP
             }
             | EXP TK_RELAT EXP
             {
-                $$.type = get_operation_type($1.type, $3.type, $2.translate);
+                $$.type = "bool";
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = $1.attributions + $3.attributions + "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = $1.translate + $3.translate + "\t" + $$.temp + " = "
@@ -950,6 +1000,14 @@ EXP         : EXP TK_SHIFT_LEFT EXP
                 $$.temp = set_variable(current_exp(), $$.type);
                 $$.attributions = "\t" + get_type($$.type) + " " + $$.temp + ";\n";
                 $$.translate = "\t" + $$.temp +" = " + var_aux.tmp + "[" + to_string(linear_position) + "]" + ";\n";
+            }
+            | FUNC_CALL
+            {
+                $$.type = $1.type;
+                $$.temp = $1.temp;
+                $$.attributions = $1.attributions;
+                $$.translate = $1.translate;
+                $$.block = "";
             }
             ;
 
