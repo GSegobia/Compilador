@@ -1,0 +1,2814 @@
+Terminals unused in grammar
+
+   TK_DYNAMIC_TYPE
+   TK_NUMBER_TYPE
+   TK_FOR
+   TK_NOT
+   TK_NOT_EQUALS_RELAT
+   TK_EQUALS_RELAT
+   TK_PLUS_EQUAL
+   TK_MINUS_EQUAL
+   TK_MULTIPLIES_EQUAL
+   TK_DIVIDES_EQUAL
+   TK_SHIFT_RIGHT
+   '^'
+
+
+State 116 conflicts: 9 shift/reduce
+State 117 conflicts: 9 shift/reduce
+State 118 conflicts: 9 shift/reduce
+State 119 conflicts: 9 shift/reduce
+State 120 conflicts: 4 shift/reduce
+State 121 conflicts: 4 shift/reduce
+State 122 conflicts: 4 shift/reduce
+State 123 conflicts: 4 shift/reduce
+State 124 conflicts: 4 shift/reduce
+
+
+Grammar
+
+    0 $accept: S $end
+
+    1 S: MAIN
+    2  | FUNCTIONS MAIN
+
+    3 FUNCTIONS: FUNCTION
+    4          | FUNCTION FUNCTIONS
+    5          | '\n' FUNCTIONS
+    6          | '\n'
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
+    8         | FUNC TK_ID '(' ARGS ')' BLOCK
+
+    9 FUNC: TK_FUNCTION
+
+   10 ARGS: ARG
+   11     | TK_TYPE TK_ID ',' ARGS
+   12     | %empty
+
+   13 ARG: TK_TYPE TK_ID
+
+   14 MAIN: MAIN_INIT BLOCK
+
+   15 MAIN_INIT: TK_START
+
+   16 BLOCK: ':' COMMANDS TK_END '\n'
+
+   17 WHILE_COM: WHILE EXP BLOCK
+
+   18 WHILE: TK_WHILE
+
+   19 DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP '\n'
+
+   20 REPEAT: TK_REPEAT
+
+   21 IF_COMMAND: IF EXP BLOCK
+   22           | IF EXP ':' COMMANDS ELSE_BLOCK
+   23           | IF EXP ':' COMMANDS ELIF_BLOCK
+
+   24 ELIF_BLOCK: ELIF EXP BLOCK
+   25           | ELIF EXP ':' COMMANDS ELIF_BLOCK
+   26           | ELIF EXP ':' COMMANDS ELSE_BLOCK
+
+   27 ELSE_BLOCK: ELSE BLOCK
+
+   28 IF: TK_IF
+
+   29 ELIF: TK_ELIF
+
+   30 ELSE: TK_ELSE
+
+   31 SWITCH_COM: SWITCH PRIMITIVE ':' '\n' CASE
+
+   32 CASE: S_CASE PRIMITIVE ':' COMMANDS TK_END
+   33     | S_CASE PRIMITIVE ':' COMMANDS CASE
+   34     | S_CASE PRIMITIVE ':' COMMANDS DEFAULT
+
+   35 DEFAULT: S_DEFAULT ':' COMMANDS TK_END
+
+   36 S_DEFAULT: TK_DEFAULT
+
+   37 S_CASE: TK_CASE
+
+   38 SWITCH: TK_SWITCH
+
+   39 FUNC_CALL: FUNC_NAME '(' FUNC_ARGS ')' '\n'
+
+   40 FUNC_NAME: TK_ID
+
+   41 FUNC_ARGS: FUNC_ARG
+   42          | FUNC_ARG ',' FUNC_ARGS
+   43          | %empty
+
+   44 FUNC_ARG: EXP
+
+   45 COMMANDS: COMMAND COMMANDS
+   46         | %empty
+
+   47 COMMAND: EXP '\n'
+   48        | ATTR '\n'
+   49        | IF_COMMAND
+   50        | WHILE_COM
+   51        | DO_WHILE_COM
+   52        | SWITCH_COM
+   53        | '\n'
+   54        | TK_OUT_LINE TK_DOUBLE_COLON EXP '\n'
+   55        | TK_OUT TK_DOUBLE_COLON EXP '\n'
+   56        | TK_IN TK_DOUBLE_COLON TK_ID '\n'
+   57        | TK_BREAK '\n'
+   58        | TK_CONTINUE '\n'
+   59        | TK_RETURN EXP '\n'
+   60        | TK_RETURN '\n'
+
+   61 ATTR: TK_TYPE TK_ID
+   62     | TK_TYPE TK_ID '=' EXP
+   63     | TK_ID '=' EXP
+   64     | TK_TYPE TK_ID '[' TK_REAL ']'
+   65     | TK_TYPE TK_ID '[' TK_REAL ',' TK_REAL ']'
+   66     | TK_ID '[' TK_REAL ']' '=' EXP
+   67     | TK_ID '[' TK_REAL ',' TK_REAL ']' '=' EXP
+
+   68 EXP: EXP TK_SHIFT_LEFT EXP
+   69    | EXP '+' EXP
+   70    | EXP '-' EXP
+   71    | EXP '*' EXP
+   72    | EXP '/' EXP
+   73    | EXP '%' EXP
+   74    | EXP TK_RELAT EXP
+   75    | EXP TK_OR EXP
+   76    | EXP TK_AND EXP
+   77    | PRIMITIVE
+   78    | UNARY_EXP
+   79    | TK_ID '[' TK_REAL ']'
+   80    | TK_ID '[' TK_REAL ',' TK_REAL ']'
+   81    | FUNC_CALL
+
+   82 UNARY_EXP: VARIABLE TK_PLUS_PLUS
+   83          | VARIABLE TK_MINUS_MINUS
+
+   84 PRIMITIVE: TK_REAL
+   85          | '-' TK_REAL
+   86          | '+' TK_REAL
+   87          | TK_STRING
+   88          | TK_CHAR
+   89          | TK_BOOL
+   90          | VARIABLE
+
+   91 VARIABLE: TK_ID
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'\n' (10) 5 6 16 19 31 39 47 48 53 54 55 56 57 58 59 60
+'%' (37) 73
+'(' (40) 7 8 39
+')' (41) 7 8 39
+'*' (42) 71
+'+' (43) 69 86
+',' (44) 11 42 65 67 80
+'-' (45) 70 85
+'/' (47) 72
+':' (58) 16 19 22 23 25 26 31 32 33 34 35
+'=' (61) 62 63 66 67
+'[' (91) 64 65 66 67 79 80
+']' (93) 64 65 66 67 79 80
+'^' (94)
+error (256)
+TK_START (258) 15
+TK_END (259) 16 32 35
+TK_TYPE (260) 7 11 13 61 62 64 65
+TK_DYNAMIC_TYPE (261)
+TK_NUMBER_TYPE (262)
+TK_ID (263) 7 8 11 13 40 56 61 62 63 64 65 66 67 79 80 91
+TK_IF (264) 28
+TK_ELIF (265) 29
+TK_ELSE (266) 30
+TK_PLUS_PLUS (267) 82
+TK_MINUS_MINUS (268) 83
+TK_WHILE (269) 18
+TK_REPEAT (270) 20
+TK_UNTIL (271) 19
+TK_FOR (272)
+TK_IN (273) 56
+TK_OUT (274) 55
+TK_OUT_LINE (275) 54
+TK_CONTINUE (276) 58
+TK_BREAK (277) 57
+TK_SWITCH (278) 38
+TK_CASE (279) 37
+TK_DEFAULT (280) 36
+TK_REAL (281) 64 65 66 67 79 80 84 85 86
+TK_CHAR (282) 88
+TK_BOOL (283) 89
+TK_STRING (284) 87
+TK_OR (285) 75
+TK_AND (286) 76
+TK_NOT (287)
+TK_RELAT (288) 74
+TK_NOT_EQUALS_RELAT (289)
+TK_EQUALS_RELAT (290)
+TK_PLUS_EQUAL (291)
+TK_MINUS_EQUAL (292)
+TK_MULTIPLIES_EQUAL (293)
+TK_DIVIDES_EQUAL (294)
+TK_DOUBLE_COLON (295) 7 54 55 56
+TK_SHIFT_LEFT (296) 68
+TK_SHIFT_RIGHT (297)
+TK_FUNCTION (298) 9
+TK_RETURN (299) 59 60
+
+
+Nonterminals, with rules where they appear
+
+$accept (59)
+    on left: 0
+S (60)
+    on left: 1 2, on right: 0
+FUNCTIONS (61)
+    on left: 3 4 5 6, on right: 2 4 5
+FUNCTION (62)
+    on left: 7 8, on right: 3 4
+FUNC (63)
+    on left: 9, on right: 7 8
+ARGS (64)
+    on left: 10 11 12, on right: 7 8 11
+ARG (65)
+    on left: 13, on right: 10
+MAIN (66)
+    on left: 14, on right: 1 2
+MAIN_INIT (67)
+    on left: 15, on right: 14
+BLOCK (68)
+    on left: 16, on right: 7 8 14 17 21 24 27
+WHILE_COM (69)
+    on left: 17, on right: 50
+WHILE (70)
+    on left: 18, on right: 17
+DO_WHILE_COM (71)
+    on left: 19, on right: 51
+REPEAT (72)
+    on left: 20, on right: 19
+IF_COMMAND (73)
+    on left: 21 22 23, on right: 49
+ELIF_BLOCK (74)
+    on left: 24 25 26, on right: 23 25
+ELSE_BLOCK (75)
+    on left: 27, on right: 22 26
+IF (76)
+    on left: 28, on right: 21 22 23
+ELIF (77)
+    on left: 29, on right: 24 25 26
+ELSE (78)
+    on left: 30, on right: 27
+SWITCH_COM (79)
+    on left: 31, on right: 52
+CASE (80)
+    on left: 32 33 34, on right: 31 33
+DEFAULT (81)
+    on left: 35, on right: 34
+S_DEFAULT (82)
+    on left: 36, on right: 35
+S_CASE (83)
+    on left: 37, on right: 32 33 34
+SWITCH (84)
+    on left: 38, on right: 31
+FUNC_CALL (85)
+    on left: 39, on right: 81
+FUNC_NAME (86)
+    on left: 40, on right: 39
+FUNC_ARGS (87)
+    on left: 41 42 43, on right: 39 42
+FUNC_ARG (88)
+    on left: 44, on right: 41 42
+COMMANDS (89)
+    on left: 45 46, on right: 16 19 22 23 25 26 32 33 34 35 45
+COMMAND (90)
+    on left: 47 48 49 50 51 52 53 54 55 56 57 58 59 60, on right: 45
+ATTR (91)
+    on left: 61 62 63 64 65 66 67, on right: 48
+EXP (92)
+    on left: 68 69 70 71 72 73 74 75 76 77 78 79 80 81, on right: 17
+    19 21 22 23 24 25 26 44 47 54 55 59 62 63 66 67 68 69 70 71 72
+    73 74 75 76
+UNARY_EXP (93)
+    on left: 82 83, on right: 78
+PRIMITIVE (94)
+    on left: 84 85 86 87 88 89 90, on right: 31 32 33 34 77
+VARIABLE (95)
+    on left: 91, on right: 82 83 90
+
+
+State 0
+
+    0 $accept: . S $end
+
+    TK_START     shift, and go to state 1
+    TK_FUNCTION  shift, and go to state 2
+    '\n'         shift, and go to state 3
+
+    S          go to state 4
+    FUNCTIONS  go to state 5
+    FUNCTION   go to state 6
+    FUNC       go to state 7
+    MAIN       go to state 8
+    MAIN_INIT  go to state 9
+
+
+State 1
+
+   15 MAIN_INIT: TK_START .
+
+    $default  reduce using rule 15 (MAIN_INIT)
+
+
+State 2
+
+    9 FUNC: TK_FUNCTION .
+
+    $default  reduce using rule 9 (FUNC)
+
+
+State 3
+
+    5 FUNCTIONS: '\n' . FUNCTIONS
+    6          | '\n' .
+
+    TK_FUNCTION  shift, and go to state 2
+    '\n'         shift, and go to state 3
+
+    $default  reduce using rule 6 (FUNCTIONS)
+
+    FUNCTIONS  go to state 10
+    FUNCTION   go to state 6
+    FUNC       go to state 7
+
+
+State 4
+
+    0 $accept: S . $end
+
+    $end  shift, and go to state 11
+
+
+State 5
+
+    2 S: FUNCTIONS . MAIN
+
+    TK_START  shift, and go to state 1
+
+    MAIN       go to state 12
+    MAIN_INIT  go to state 9
+
+
+State 6
+
+    3 FUNCTIONS: FUNCTION .
+    4          | FUNCTION . FUNCTIONS
+
+    TK_FUNCTION  shift, and go to state 2
+    '\n'         shift, and go to state 3
+
+    $default  reduce using rule 3 (FUNCTIONS)
+
+    FUNCTIONS  go to state 13
+    FUNCTION   go to state 6
+    FUNC       go to state 7
+
+
+State 7
+
+    7 FUNCTION: FUNC . TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
+    8         | FUNC . TK_ID '(' ARGS ')' BLOCK
+
+    TK_TYPE  shift, and go to state 14
+    TK_ID    shift, and go to state 15
+
+
+State 8
+
+    1 S: MAIN .
+
+    $default  reduce using rule 1 (S)
+
+
+State 9
+
+   14 MAIN: MAIN_INIT . BLOCK
+
+    ':'  shift, and go to state 16
+
+    BLOCK  go to state 17
+
+
+State 10
+
+    5 FUNCTIONS: '\n' FUNCTIONS .
+
+    $default  reduce using rule 5 (FUNCTIONS)
+
+
+State 11
+
+    0 $accept: S $end .
+
+    $default  accept
+
+
+State 12
+
+    2 S: FUNCTIONS MAIN .
+
+    $default  reduce using rule 2 (S)
+
+
+State 13
+
+    4 FUNCTIONS: FUNCTION FUNCTIONS .
+
+    $default  reduce using rule 4 (FUNCTIONS)
+
+
+State 14
+
+    7 FUNCTION: FUNC TK_TYPE . TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK
+
+    TK_DOUBLE_COLON  shift, and go to state 18
+
+
+State 15
+
+    8 FUNCTION: FUNC TK_ID . '(' ARGS ')' BLOCK
+
+    '('  shift, and go to state 19
+
+
+State 16
+
+   16 BLOCK: ':' . COMMANDS TK_END '\n'
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 49
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 17
+
+   14 MAIN: MAIN_INIT BLOCK .
+
+    $default  reduce using rule 14 (MAIN)
+
+
+State 18
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON . TK_ID '(' ARGS ')' BLOCK
+
+    TK_ID  shift, and go to state 56
+
+
+State 19
+
+    8 FUNCTION: FUNC TK_ID '(' . ARGS ')' BLOCK
+
+    TK_TYPE  shift, and go to state 57
+
+    $default  reduce using rule 12 (ARGS)
+
+    ARGS  go to state 58
+    ARG   go to state 59
+
+
+State 20
+
+   61 ATTR: TK_TYPE . TK_ID
+   62     | TK_TYPE . TK_ID '=' EXP
+   64     | TK_TYPE . TK_ID '[' TK_REAL ']'
+   65     | TK_TYPE . TK_ID '[' TK_REAL ',' TK_REAL ']'
+
+    TK_ID  shift, and go to state 60
+
+
+State 21
+
+   40 FUNC_NAME: TK_ID .
+   63 ATTR: TK_ID . '=' EXP
+   66     | TK_ID . '[' TK_REAL ']' '=' EXP
+   67     | TK_ID . '[' TK_REAL ',' TK_REAL ']' '=' EXP
+   79 EXP: TK_ID . '[' TK_REAL ']'
+   80    | TK_ID . '[' TK_REAL ',' TK_REAL ']'
+   91 VARIABLE: TK_ID .
+
+    '='  shift, and go to state 61
+    '['  shift, and go to state 62
+
+    '('       reduce using rule 40 (FUNC_NAME)
+    $default  reduce using rule 91 (VARIABLE)
+
+
+State 22
+
+   28 IF: TK_IF .
+
+    $default  reduce using rule 28 (IF)
+
+
+State 23
+
+   18 WHILE: TK_WHILE .
+
+    $default  reduce using rule 18 (WHILE)
+
+
+State 24
+
+   20 REPEAT: TK_REPEAT .
+
+    $default  reduce using rule 20 (REPEAT)
+
+
+State 25
+
+   56 COMMAND: TK_IN . TK_DOUBLE_COLON TK_ID '\n'
+
+    TK_DOUBLE_COLON  shift, and go to state 63
+
+
+State 26
+
+   55 COMMAND: TK_OUT . TK_DOUBLE_COLON EXP '\n'
+
+    TK_DOUBLE_COLON  shift, and go to state 64
+
+
+State 27
+
+   54 COMMAND: TK_OUT_LINE . TK_DOUBLE_COLON EXP '\n'
+
+    TK_DOUBLE_COLON  shift, and go to state 65
+
+
+State 28
+
+   58 COMMAND: TK_CONTINUE . '\n'
+
+    '\n'  shift, and go to state 66
+
+
+State 29
+
+   57 COMMAND: TK_BREAK . '\n'
+
+    '\n'  shift, and go to state 67
+
+
+State 30
+
+   38 SWITCH: TK_SWITCH .
+
+    $default  reduce using rule 38 (SWITCH)
+
+
+State 31
+
+   84 PRIMITIVE: TK_REAL .
+
+    $default  reduce using rule 84 (PRIMITIVE)
+
+
+State 32
+
+   88 PRIMITIVE: TK_CHAR .
+
+    $default  reduce using rule 88 (PRIMITIVE)
+
+
+State 33
+
+   89 PRIMITIVE: TK_BOOL .
+
+    $default  reduce using rule 89 (PRIMITIVE)
+
+
+State 34
+
+   87 PRIMITIVE: TK_STRING .
+
+    $default  reduce using rule 87 (PRIMITIVE)
+
+
+State 35
+
+   59 COMMAND: TK_RETURN . EXP '\n'
+   60        | TK_RETURN . '\n'
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+    '\n'       shift, and go to state 69
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 70
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 36
+
+   86 PRIMITIVE: '+' . TK_REAL
+
+    TK_REAL  shift, and go to state 71
+
+
+State 37
+
+   85 PRIMITIVE: '-' . TK_REAL
+
+    TK_REAL  shift, and go to state 72
+
+
+State 38
+
+   53 COMMAND: '\n' .
+
+    $default  reduce using rule 53 (COMMAND)
+
+
+State 39
+
+   50 COMMAND: WHILE_COM .
+
+    $default  reduce using rule 50 (COMMAND)
+
+
+State 40
+
+   17 WHILE_COM: WHILE . EXP BLOCK
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 73
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 41
+
+   51 COMMAND: DO_WHILE_COM .
+
+    $default  reduce using rule 51 (COMMAND)
+
+
+State 42
+
+   19 DO_WHILE_COM: REPEAT . ':' COMMANDS TK_UNTIL EXP '\n'
+
+    ':'  shift, and go to state 74
+
+
+State 43
+
+   49 COMMAND: IF_COMMAND .
+
+    $default  reduce using rule 49 (COMMAND)
+
+
+State 44
+
+   21 IF_COMMAND: IF . EXP BLOCK
+   22           | IF . EXP ':' COMMANDS ELSE_BLOCK
+   23           | IF . EXP ':' COMMANDS ELIF_BLOCK
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 75
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 45
+
+   52 COMMAND: SWITCH_COM .
+
+    $default  reduce using rule 52 (COMMAND)
+
+
+State 46
+
+   31 SWITCH_COM: SWITCH . PRIMITIVE ':' '\n' CASE
+
+    TK_ID      shift, and go to state 76
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    PRIMITIVE  go to state 77
+    VARIABLE   go to state 78
+
+
+State 47
+
+   81 EXP: FUNC_CALL .
+
+    $default  reduce using rule 81 (EXP)
+
+
+State 48
+
+   39 FUNC_CALL: FUNC_NAME . '(' FUNC_ARGS ')' '\n'
+
+    '('  shift, and go to state 79
+
+
+State 49
+
+   16 BLOCK: ':' COMMANDS . TK_END '\n'
+
+    TK_END  shift, and go to state 80
+
+
+State 50
+
+   45 COMMANDS: COMMAND . COMMANDS
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 81
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 51
+
+   48 COMMAND: ATTR . '\n'
+
+    '\n'  shift, and go to state 82
+
+
+State 52
+
+   47 COMMAND: EXP . '\n'
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    '\n'           shift, and go to state 92
+
+
+State 53
+
+   78 EXP: UNARY_EXP .
+
+    $default  reduce using rule 78 (EXP)
+
+
+State 54
+
+   77 EXP: PRIMITIVE .
+
+    $default  reduce using rule 77 (EXP)
+
+
+State 55
+
+   82 UNARY_EXP: VARIABLE . TK_PLUS_PLUS
+   83          | VARIABLE . TK_MINUS_MINUS
+   90 PRIMITIVE: VARIABLE .
+
+    TK_PLUS_PLUS    shift, and go to state 93
+    TK_MINUS_MINUS  shift, and go to state 94
+
+    $default  reduce using rule 90 (PRIMITIVE)
+
+
+State 56
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID . '(' ARGS ')' BLOCK
+
+    '('  shift, and go to state 95
+
+
+State 57
+
+   11 ARGS: TK_TYPE . TK_ID ',' ARGS
+   13 ARG: TK_TYPE . TK_ID
+
+    TK_ID  shift, and go to state 96
+
+
+State 58
+
+    8 FUNCTION: FUNC TK_ID '(' ARGS . ')' BLOCK
+
+    ')'  shift, and go to state 97
+
+
+State 59
+
+   10 ARGS: ARG .
+
+    $default  reduce using rule 10 (ARGS)
+
+
+State 60
+
+   61 ATTR: TK_TYPE TK_ID .
+   62     | TK_TYPE TK_ID . '=' EXP
+   64     | TK_TYPE TK_ID . '[' TK_REAL ']'
+   65     | TK_TYPE TK_ID . '[' TK_REAL ',' TK_REAL ']'
+
+    '='  shift, and go to state 98
+    '['  shift, and go to state 99
+
+    $default  reduce using rule 61 (ATTR)
+
+
+State 61
+
+   63 ATTR: TK_ID '=' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 100
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 62
+
+   66 ATTR: TK_ID '[' . TK_REAL ']' '=' EXP
+   67     | TK_ID '[' . TK_REAL ',' TK_REAL ']' '=' EXP
+   79 EXP: TK_ID '[' . TK_REAL ']'
+   80    | TK_ID '[' . TK_REAL ',' TK_REAL ']'
+
+    TK_REAL  shift, and go to state 101
+
+
+State 63
+
+   56 COMMAND: TK_IN TK_DOUBLE_COLON . TK_ID '\n'
+
+    TK_ID  shift, and go to state 102
+
+
+State 64
+
+   55 COMMAND: TK_OUT TK_DOUBLE_COLON . EXP '\n'
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 103
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 65
+
+   54 COMMAND: TK_OUT_LINE TK_DOUBLE_COLON . EXP '\n'
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 104
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 66
+
+   58 COMMAND: TK_CONTINUE '\n' .
+
+    $default  reduce using rule 58 (COMMAND)
+
+
+State 67
+
+   57 COMMAND: TK_BREAK '\n' .
+
+    $default  reduce using rule 57 (COMMAND)
+
+
+State 68
+
+   40 FUNC_NAME: TK_ID .
+   79 EXP: TK_ID . '[' TK_REAL ']'
+   80    | TK_ID . '[' TK_REAL ',' TK_REAL ']'
+   91 VARIABLE: TK_ID .
+
+    '['  shift, and go to state 105
+
+    '('       reduce using rule 40 (FUNC_NAME)
+    $default  reduce using rule 91 (VARIABLE)
+
+
+State 69
+
+   60 COMMAND: TK_RETURN '\n' .
+
+    $default  reduce using rule 60 (COMMAND)
+
+
+State 70
+
+   59 COMMAND: TK_RETURN EXP . '\n'
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    '\n'           shift, and go to state 106
+
+
+State 71
+
+   86 PRIMITIVE: '+' TK_REAL .
+
+    $default  reduce using rule 86 (PRIMITIVE)
+
+
+State 72
+
+   85 PRIMITIVE: '-' TK_REAL .
+
+    $default  reduce using rule 85 (PRIMITIVE)
+
+
+State 73
+
+   17 WHILE_COM: WHILE EXP . BLOCK
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    ':'            shift, and go to state 16
+
+    BLOCK  go to state 107
+
+
+State 74
+
+   19 DO_WHILE_COM: REPEAT ':' . COMMANDS TK_UNTIL EXP '\n'
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 108
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 75
+
+   21 IF_COMMAND: IF EXP . BLOCK
+   22           | IF EXP . ':' COMMANDS ELSE_BLOCK
+   23           | IF EXP . ':' COMMANDS ELIF_BLOCK
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    ':'            shift, and go to state 109
+
+    BLOCK  go to state 110
+
+
+State 76
+
+   91 VARIABLE: TK_ID .
+
+    $default  reduce using rule 91 (VARIABLE)
+
+
+State 77
+
+   31 SWITCH_COM: SWITCH PRIMITIVE . ':' '\n' CASE
+
+    ':'  shift, and go to state 111
+
+
+State 78
+
+   90 PRIMITIVE: VARIABLE .
+
+    $default  reduce using rule 90 (PRIMITIVE)
+
+
+State 79
+
+   39 FUNC_CALL: FUNC_NAME '(' . FUNC_ARGS ')' '\n'
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    $default  reduce using rule 43 (FUNC_ARGS)
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    FUNC_ARGS  go to state 112
+    FUNC_ARG   go to state 113
+    EXP        go to state 114
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 80
+
+   16 BLOCK: ':' COMMANDS TK_END . '\n'
+
+    '\n'  shift, and go to state 115
+
+
+State 81
+
+   45 COMMANDS: COMMAND COMMANDS .
+
+    $default  reduce using rule 45 (COMMANDS)
+
+
+State 82
+
+   48 COMMAND: ATTR '\n' .
+
+    $default  reduce using rule 48 (COMMAND)
+
+
+State 83
+
+   75 EXP: EXP TK_OR . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 116
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 84
+
+   76 EXP: EXP TK_AND . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 117
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 85
+
+   74 EXP: EXP TK_RELAT . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 118
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 86
+
+   68 EXP: EXP TK_SHIFT_LEFT . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 119
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 87
+
+   69 EXP: EXP '+' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 120
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 88
+
+   70 EXP: EXP '-' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 121
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 89
+
+   71 EXP: EXP '*' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 122
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 90
+
+   72 EXP: EXP '/' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 123
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 91
+
+   73 EXP: EXP '%' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 124
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 92
+
+   47 COMMAND: EXP '\n' .
+
+    $default  reduce using rule 47 (COMMAND)
+
+
+State 93
+
+   82 UNARY_EXP: VARIABLE TK_PLUS_PLUS .
+
+    $default  reduce using rule 82 (UNARY_EXP)
+
+
+State 94
+
+   83 UNARY_EXP: VARIABLE TK_MINUS_MINUS .
+
+    $default  reduce using rule 83 (UNARY_EXP)
+
+
+State 95
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' . ARGS ')' BLOCK
+
+    TK_TYPE  shift, and go to state 57
+
+    $default  reduce using rule 12 (ARGS)
+
+    ARGS  go to state 125
+    ARG   go to state 59
+
+
+State 96
+
+   11 ARGS: TK_TYPE TK_ID . ',' ARGS
+   13 ARG: TK_TYPE TK_ID .
+
+    ','  shift, and go to state 126
+
+    $default  reduce using rule 13 (ARG)
+
+
+State 97
+
+    8 FUNCTION: FUNC TK_ID '(' ARGS ')' . BLOCK
+
+    ':'  shift, and go to state 16
+
+    BLOCK  go to state 127
+
+
+State 98
+
+   62 ATTR: TK_TYPE TK_ID '=' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 128
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 99
+
+   64 ATTR: TK_TYPE TK_ID '[' . TK_REAL ']'
+   65     | TK_TYPE TK_ID '[' . TK_REAL ',' TK_REAL ']'
+
+    TK_REAL  shift, and go to state 129
+
+
+State 100
+
+   63 ATTR: TK_ID '=' EXP .
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    $default  reduce using rule 63 (ATTR)
+
+
+State 101
+
+   66 ATTR: TK_ID '[' TK_REAL . ']' '=' EXP
+   67     | TK_ID '[' TK_REAL . ',' TK_REAL ']' '=' EXP
+   79 EXP: TK_ID '[' TK_REAL . ']'
+   80    | TK_ID '[' TK_REAL . ',' TK_REAL ']'
+
+    ','  shift, and go to state 130
+    ']'  shift, and go to state 131
+
+
+State 102
+
+   56 COMMAND: TK_IN TK_DOUBLE_COLON TK_ID . '\n'
+
+    '\n'  shift, and go to state 132
+
+
+State 103
+
+   55 COMMAND: TK_OUT TK_DOUBLE_COLON EXP . '\n'
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    '\n'           shift, and go to state 133
+
+
+State 104
+
+   54 COMMAND: TK_OUT_LINE TK_DOUBLE_COLON EXP . '\n'
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    '\n'           shift, and go to state 134
+
+
+State 105
+
+   79 EXP: TK_ID '[' . TK_REAL ']'
+   80    | TK_ID '[' . TK_REAL ',' TK_REAL ']'
+
+    TK_REAL  shift, and go to state 135
+
+
+State 106
+
+   59 COMMAND: TK_RETURN EXP '\n' .
+
+    $default  reduce using rule 59 (COMMAND)
+
+
+State 107
+
+   17 WHILE_COM: WHILE EXP BLOCK .
+
+    $default  reduce using rule 17 (WHILE_COM)
+
+
+State 108
+
+   19 DO_WHILE_COM: REPEAT ':' COMMANDS . TK_UNTIL EXP '\n'
+
+    TK_UNTIL  shift, and go to state 136
+
+
+State 109
+
+   16 BLOCK: ':' . COMMANDS TK_END '\n'
+   22 IF_COMMAND: IF EXP ':' . COMMANDS ELSE_BLOCK
+   23           | IF EXP ':' . COMMANDS ELIF_BLOCK
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 137
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 110
+
+   21 IF_COMMAND: IF EXP BLOCK .
+
+    $default  reduce using rule 21 (IF_COMMAND)
+
+
+State 111
+
+   31 SWITCH_COM: SWITCH PRIMITIVE ':' . '\n' CASE
+
+    '\n'  shift, and go to state 138
+
+
+State 112
+
+   39 FUNC_CALL: FUNC_NAME '(' FUNC_ARGS . ')' '\n'
+
+    ')'  shift, and go to state 139
+
+
+State 113
+
+   41 FUNC_ARGS: FUNC_ARG .
+   42          | FUNC_ARG . ',' FUNC_ARGS
+
+    ','  shift, and go to state 140
+
+    $default  reduce using rule 41 (FUNC_ARGS)
+
+
+State 114
+
+   44 FUNC_ARG: EXP .
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    $default  reduce using rule 44 (FUNC_ARG)
+
+
+State 115
+
+   16 BLOCK: ':' COMMANDS TK_END '\n' .
+
+    $default  reduce using rule 16 (BLOCK)
+
+
+State 116
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   75    | EXP TK_OR EXP .
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 75 (EXP)]
+    TK_AND         [reduce using rule 75 (EXP)]
+    TK_RELAT       [reduce using rule 75 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 75 (EXP)]
+    '+'            [reduce using rule 75 (EXP)]
+    '-'            [reduce using rule 75 (EXP)]
+    '*'            [reduce using rule 75 (EXP)]
+    '/'            [reduce using rule 75 (EXP)]
+    '%'            [reduce using rule 75 (EXP)]
+    $default       reduce using rule 75 (EXP)
+
+
+State 117
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+   76    | EXP TK_AND EXP .
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 76 (EXP)]
+    TK_AND         [reduce using rule 76 (EXP)]
+    TK_RELAT       [reduce using rule 76 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 76 (EXP)]
+    '+'            [reduce using rule 76 (EXP)]
+    '-'            [reduce using rule 76 (EXP)]
+    '*'            [reduce using rule 76 (EXP)]
+    '/'            [reduce using rule 76 (EXP)]
+    '%'            [reduce using rule 76 (EXP)]
+    $default       reduce using rule 76 (EXP)
+
+
+State 118
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   74    | EXP TK_RELAT EXP .
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 74 (EXP)]
+    TK_AND         [reduce using rule 74 (EXP)]
+    TK_RELAT       [reduce using rule 74 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 74 (EXP)]
+    '+'            [reduce using rule 74 (EXP)]
+    '-'            [reduce using rule 74 (EXP)]
+    '*'            [reduce using rule 74 (EXP)]
+    '/'            [reduce using rule 74 (EXP)]
+    '%'            [reduce using rule 74 (EXP)]
+    $default       reduce using rule 74 (EXP)
+
+
+State 119
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   68    | EXP TK_SHIFT_LEFT EXP .
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 68 (EXP)]
+    TK_AND         [reduce using rule 68 (EXP)]
+    TK_RELAT       [reduce using rule 68 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 68 (EXP)]
+    '+'            [reduce using rule 68 (EXP)]
+    '-'            [reduce using rule 68 (EXP)]
+    '*'            [reduce using rule 68 (EXP)]
+    '/'            [reduce using rule 68 (EXP)]
+    '%'            [reduce using rule 68 (EXP)]
+    $default       reduce using rule 68 (EXP)
+
+
+State 120
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   69    | EXP '+' EXP .
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 69 (EXP)]
+    TK_AND         [reduce using rule 69 (EXP)]
+    TK_RELAT       [reduce using rule 69 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 69 (EXP)]
+    $default       reduce using rule 69 (EXP)
+
+
+State 121
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   70    | EXP '-' EXP .
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    TK_OR          [reduce using rule 70 (EXP)]
+    TK_AND         [reduce using rule 70 (EXP)]
+    TK_RELAT       [reduce using rule 70 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 70 (EXP)]
+    $default       reduce using rule 70 (EXP)
+
+
+State 122
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   71    | EXP '*' EXP .
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+
+    TK_OR          [reduce using rule 71 (EXP)]
+    TK_AND         [reduce using rule 71 (EXP)]
+    TK_RELAT       [reduce using rule 71 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 71 (EXP)]
+    $default       reduce using rule 71 (EXP)
+
+
+State 123
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   72    | EXP '/' EXP .
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+
+    TK_OR          [reduce using rule 72 (EXP)]
+    TK_AND         [reduce using rule 72 (EXP)]
+    TK_RELAT       [reduce using rule 72 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 72 (EXP)]
+    $default       reduce using rule 72 (EXP)
+
+
+State 124
+
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   73    | EXP '%' EXP .
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+
+    TK_OR          [reduce using rule 73 (EXP)]
+    TK_AND         [reduce using rule 73 (EXP)]
+    TK_RELAT       [reduce using rule 73 (EXP)]
+    TK_SHIFT_LEFT  [reduce using rule 73 (EXP)]
+    $default       reduce using rule 73 (EXP)
+
+
+State 125
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS . ')' BLOCK
+
+    ')'  shift, and go to state 141
+
+
+State 126
+
+   11 ARGS: TK_TYPE TK_ID ',' . ARGS
+
+    TK_TYPE  shift, and go to state 57
+
+    $default  reduce using rule 12 (ARGS)
+
+    ARGS  go to state 142
+    ARG   go to state 59
+
+
+State 127
+
+    8 FUNCTION: FUNC TK_ID '(' ARGS ')' BLOCK .
+
+    $default  reduce using rule 8 (FUNCTION)
+
+
+State 128
+
+   62 ATTR: TK_TYPE TK_ID '=' EXP .
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    $default  reduce using rule 62 (ATTR)
+
+
+State 129
+
+   64 ATTR: TK_TYPE TK_ID '[' TK_REAL . ']'
+   65     | TK_TYPE TK_ID '[' TK_REAL . ',' TK_REAL ']'
+
+    ','  shift, and go to state 143
+    ']'  shift, and go to state 144
+
+
+State 130
+
+   67 ATTR: TK_ID '[' TK_REAL ',' . TK_REAL ']' '=' EXP
+   80 EXP: TK_ID '[' TK_REAL ',' . TK_REAL ']'
+
+    TK_REAL  shift, and go to state 145
+
+
+State 131
+
+   66 ATTR: TK_ID '[' TK_REAL ']' . '=' EXP
+   79 EXP: TK_ID '[' TK_REAL ']' .
+
+    '='  shift, and go to state 146
+
+    $default  reduce using rule 79 (EXP)
+
+
+State 132
+
+   56 COMMAND: TK_IN TK_DOUBLE_COLON TK_ID '\n' .
+
+    $default  reduce using rule 56 (COMMAND)
+
+
+State 133
+
+   55 COMMAND: TK_OUT TK_DOUBLE_COLON EXP '\n' .
+
+    $default  reduce using rule 55 (COMMAND)
+
+
+State 134
+
+   54 COMMAND: TK_OUT_LINE TK_DOUBLE_COLON EXP '\n' .
+
+    $default  reduce using rule 54 (COMMAND)
+
+
+State 135
+
+   79 EXP: TK_ID '[' TK_REAL . ']'
+   80    | TK_ID '[' TK_REAL . ',' TK_REAL ']'
+
+    ','  shift, and go to state 147
+    ']'  shift, and go to state 148
+
+
+State 136
+
+   19 DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL . EXP '\n'
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 149
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 137
+
+   16 BLOCK: ':' COMMANDS . TK_END '\n'
+   22 IF_COMMAND: IF EXP ':' COMMANDS . ELSE_BLOCK
+   23           | IF EXP ':' COMMANDS . ELIF_BLOCK
+
+    TK_END   shift, and go to state 80
+    TK_ELIF  shift, and go to state 150
+    TK_ELSE  shift, and go to state 151
+
+    ELIF_BLOCK  go to state 152
+    ELSE_BLOCK  go to state 153
+    ELIF        go to state 154
+    ELSE        go to state 155
+
+
+State 138
+
+   31 SWITCH_COM: SWITCH PRIMITIVE ':' '\n' . CASE
+
+    TK_CASE  shift, and go to state 156
+
+    CASE    go to state 157
+    S_CASE  go to state 158
+
+
+State 139
+
+   39 FUNC_CALL: FUNC_NAME '(' FUNC_ARGS ')' . '\n'
+
+    '\n'  shift, and go to state 159
+
+
+State 140
+
+   42 FUNC_ARGS: FUNC_ARG ',' . FUNC_ARGS
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    $default  reduce using rule 43 (FUNC_ARGS)
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    FUNC_ARGS  go to state 160
+    FUNC_ARG   go to state 113
+    EXP        go to state 114
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 141
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' . BLOCK
+
+    ':'  shift, and go to state 16
+
+    BLOCK  go to state 161
+
+
+State 142
+
+   11 ARGS: TK_TYPE TK_ID ',' ARGS .
+
+    $default  reduce using rule 11 (ARGS)
+
+
+State 143
+
+   65 ATTR: TK_TYPE TK_ID '[' TK_REAL ',' . TK_REAL ']'
+
+    TK_REAL  shift, and go to state 162
+
+
+State 144
+
+   64 ATTR: TK_TYPE TK_ID '[' TK_REAL ']' .
+
+    $default  reduce using rule 64 (ATTR)
+
+
+State 145
+
+   67 ATTR: TK_ID '[' TK_REAL ',' TK_REAL . ']' '=' EXP
+   80 EXP: TK_ID '[' TK_REAL ',' TK_REAL . ']'
+
+    ']'  shift, and go to state 163
+
+
+State 146
+
+   66 ATTR: TK_ID '[' TK_REAL ']' '=' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 164
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 147
+
+   80 EXP: TK_ID '[' TK_REAL ',' . TK_REAL ']'
+
+    TK_REAL  shift, and go to state 165
+
+
+State 148
+
+   79 EXP: TK_ID '[' TK_REAL ']' .
+
+    $default  reduce using rule 79 (EXP)
+
+
+State 149
+
+   19 DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP . '\n'
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    '\n'           shift, and go to state 166
+
+
+State 150
+
+   29 ELIF: TK_ELIF .
+
+    $default  reduce using rule 29 (ELIF)
+
+
+State 151
+
+   30 ELSE: TK_ELSE .
+
+    $default  reduce using rule 30 (ELSE)
+
+
+State 152
+
+   23 IF_COMMAND: IF EXP ':' COMMANDS ELIF_BLOCK .
+
+    $default  reduce using rule 23 (IF_COMMAND)
+
+
+State 153
+
+   22 IF_COMMAND: IF EXP ':' COMMANDS ELSE_BLOCK .
+
+    $default  reduce using rule 22 (IF_COMMAND)
+
+
+State 154
+
+   24 ELIF_BLOCK: ELIF . EXP BLOCK
+   25           | ELIF . EXP ':' COMMANDS ELIF_BLOCK
+   26           | ELIF . EXP ':' COMMANDS ELSE_BLOCK
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 167
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 155
+
+   27 ELSE_BLOCK: ELSE . BLOCK
+
+    ':'  shift, and go to state 16
+
+    BLOCK  go to state 168
+
+
+State 156
+
+   37 S_CASE: TK_CASE .
+
+    $default  reduce using rule 37 (S_CASE)
+
+
+State 157
+
+   31 SWITCH_COM: SWITCH PRIMITIVE ':' '\n' CASE .
+
+    $default  reduce using rule 31 (SWITCH_COM)
+
+
+State 158
+
+   32 CASE: S_CASE . PRIMITIVE ':' COMMANDS TK_END
+   33     | S_CASE . PRIMITIVE ':' COMMANDS CASE
+   34     | S_CASE . PRIMITIVE ':' COMMANDS DEFAULT
+
+    TK_ID      shift, and go to state 76
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    PRIMITIVE  go to state 169
+    VARIABLE   go to state 78
+
+
+State 159
+
+   39 FUNC_CALL: FUNC_NAME '(' FUNC_ARGS ')' '\n' .
+
+    $default  reduce using rule 39 (FUNC_CALL)
+
+
+State 160
+
+   42 FUNC_ARGS: FUNC_ARG ',' FUNC_ARGS .
+
+    $default  reduce using rule 42 (FUNC_ARGS)
+
+
+State 161
+
+    7 FUNCTION: FUNC TK_TYPE TK_DOUBLE_COLON TK_ID '(' ARGS ')' BLOCK .
+
+    $default  reduce using rule 7 (FUNCTION)
+
+
+State 162
+
+   65 ATTR: TK_TYPE TK_ID '[' TK_REAL ',' TK_REAL . ']'
+
+    ']'  shift, and go to state 170
+
+
+State 163
+
+   67 ATTR: TK_ID '[' TK_REAL ',' TK_REAL ']' . '=' EXP
+   80 EXP: TK_ID '[' TK_REAL ',' TK_REAL ']' .
+
+    '='  shift, and go to state 171
+
+    $default  reduce using rule 80 (EXP)
+
+
+State 164
+
+   66 ATTR: TK_ID '[' TK_REAL ']' '=' EXP .
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    $default  reduce using rule 66 (ATTR)
+
+
+State 165
+
+   80 EXP: TK_ID '[' TK_REAL ',' TK_REAL . ']'
+
+    ']'  shift, and go to state 172
+
+
+State 166
+
+   19 DO_WHILE_COM: REPEAT ':' COMMANDS TK_UNTIL EXP '\n' .
+
+    $default  reduce using rule 19 (DO_WHILE_COM)
+
+
+State 167
+
+   24 ELIF_BLOCK: ELIF EXP . BLOCK
+   25           | ELIF EXP . ':' COMMANDS ELIF_BLOCK
+   26           | ELIF EXP . ':' COMMANDS ELSE_BLOCK
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+    ':'            shift, and go to state 173
+
+    BLOCK  go to state 174
+
+
+State 168
+
+   27 ELSE_BLOCK: ELSE BLOCK .
+
+    $default  reduce using rule 27 (ELSE_BLOCK)
+
+
+State 169
+
+   32 CASE: S_CASE PRIMITIVE . ':' COMMANDS TK_END
+   33     | S_CASE PRIMITIVE . ':' COMMANDS CASE
+   34     | S_CASE PRIMITIVE . ':' COMMANDS DEFAULT
+
+    ':'  shift, and go to state 175
+
+
+State 170
+
+   65 ATTR: TK_TYPE TK_ID '[' TK_REAL ',' TK_REAL ']' .
+
+    $default  reduce using rule 65 (ATTR)
+
+
+State 171
+
+   67 ATTR: TK_ID '[' TK_REAL ',' TK_REAL ']' '=' . EXP
+
+    TK_ID      shift, and go to state 68
+    TK_REAL    shift, and go to state 31
+    TK_CHAR    shift, and go to state 32
+    TK_BOOL    shift, and go to state 33
+    TK_STRING  shift, and go to state 34
+    '+'        shift, and go to state 36
+    '-'        shift, and go to state 37
+
+    FUNC_CALL  go to state 47
+    FUNC_NAME  go to state 48
+    EXP        go to state 176
+    UNARY_EXP  go to state 53
+    PRIMITIVE  go to state 54
+    VARIABLE   go to state 55
+
+
+State 172
+
+   80 EXP: TK_ID '[' TK_REAL ',' TK_REAL ']' .
+
+    $default  reduce using rule 80 (EXP)
+
+
+State 173
+
+   16 BLOCK: ':' . COMMANDS TK_END '\n'
+   25 ELIF_BLOCK: ELIF EXP ':' . COMMANDS ELIF_BLOCK
+   26           | ELIF EXP ':' . COMMANDS ELSE_BLOCK
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 177
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 174
+
+   24 ELIF_BLOCK: ELIF EXP BLOCK .
+
+    $default  reduce using rule 24 (ELIF_BLOCK)
+
+
+State 175
+
+   32 CASE: S_CASE PRIMITIVE ':' . COMMANDS TK_END
+   33     | S_CASE PRIMITIVE ':' . COMMANDS CASE
+   34     | S_CASE PRIMITIVE ':' . COMMANDS DEFAULT
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 178
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 176
+
+   67 ATTR: TK_ID '[' TK_REAL ',' TK_REAL ']' '=' EXP .
+   68 EXP: EXP . TK_SHIFT_LEFT EXP
+   69    | EXP . '+' EXP
+   70    | EXP . '-' EXP
+   71    | EXP . '*' EXP
+   72    | EXP . '/' EXP
+   73    | EXP . '%' EXP
+   74    | EXP . TK_RELAT EXP
+   75    | EXP . TK_OR EXP
+   76    | EXP . TK_AND EXP
+
+    TK_OR          shift, and go to state 83
+    TK_AND         shift, and go to state 84
+    TK_RELAT       shift, and go to state 85
+    TK_SHIFT_LEFT  shift, and go to state 86
+    '+'            shift, and go to state 87
+    '-'            shift, and go to state 88
+    '*'            shift, and go to state 89
+    '/'            shift, and go to state 90
+    '%'            shift, and go to state 91
+
+    $default  reduce using rule 67 (ATTR)
+
+
+State 177
+
+   16 BLOCK: ':' COMMANDS . TK_END '\n'
+   25 ELIF_BLOCK: ELIF EXP ':' COMMANDS . ELIF_BLOCK
+   26           | ELIF EXP ':' COMMANDS . ELSE_BLOCK
+
+    TK_END   shift, and go to state 80
+    TK_ELIF  shift, and go to state 150
+    TK_ELSE  shift, and go to state 151
+
+    ELIF_BLOCK  go to state 179
+    ELSE_BLOCK  go to state 180
+    ELIF        go to state 154
+    ELSE        go to state 155
+
+
+State 178
+
+   32 CASE: S_CASE PRIMITIVE ':' COMMANDS . TK_END
+   33     | S_CASE PRIMITIVE ':' COMMANDS . CASE
+   34     | S_CASE PRIMITIVE ':' COMMANDS . DEFAULT
+
+    TK_END      shift, and go to state 181
+    TK_CASE     shift, and go to state 156
+    TK_DEFAULT  shift, and go to state 182
+
+    CASE       go to state 183
+    DEFAULT    go to state 184
+    S_DEFAULT  go to state 185
+    S_CASE     go to state 158
+
+
+State 179
+
+   25 ELIF_BLOCK: ELIF EXP ':' COMMANDS ELIF_BLOCK .
+
+    $default  reduce using rule 25 (ELIF_BLOCK)
+
+
+State 180
+
+   26 ELIF_BLOCK: ELIF EXP ':' COMMANDS ELSE_BLOCK .
+
+    $default  reduce using rule 26 (ELIF_BLOCK)
+
+
+State 181
+
+   32 CASE: S_CASE PRIMITIVE ':' COMMANDS TK_END .
+
+    $default  reduce using rule 32 (CASE)
+
+
+State 182
+
+   36 S_DEFAULT: TK_DEFAULT .
+
+    $default  reduce using rule 36 (S_DEFAULT)
+
+
+State 183
+
+   33 CASE: S_CASE PRIMITIVE ':' COMMANDS CASE .
+
+    $default  reduce using rule 33 (CASE)
+
+
+State 184
+
+   34 CASE: S_CASE PRIMITIVE ':' COMMANDS DEFAULT .
+
+    $default  reduce using rule 34 (CASE)
+
+
+State 185
+
+   35 DEFAULT: S_DEFAULT . ':' COMMANDS TK_END
+
+    ':'  shift, and go to state 186
+
+
+State 186
+
+   35 DEFAULT: S_DEFAULT ':' . COMMANDS TK_END
+
+    TK_TYPE      shift, and go to state 20
+    TK_ID        shift, and go to state 21
+    TK_IF        shift, and go to state 22
+    TK_WHILE     shift, and go to state 23
+    TK_REPEAT    shift, and go to state 24
+    TK_IN        shift, and go to state 25
+    TK_OUT       shift, and go to state 26
+    TK_OUT_LINE  shift, and go to state 27
+    TK_CONTINUE  shift, and go to state 28
+    TK_BREAK     shift, and go to state 29
+    TK_SWITCH    shift, and go to state 30
+    TK_REAL      shift, and go to state 31
+    TK_CHAR      shift, and go to state 32
+    TK_BOOL      shift, and go to state 33
+    TK_STRING    shift, and go to state 34
+    TK_RETURN    shift, and go to state 35
+    '+'          shift, and go to state 36
+    '-'          shift, and go to state 37
+    '\n'         shift, and go to state 38
+
+    $default  reduce using rule 46 (COMMANDS)
+
+    WHILE_COM     go to state 39
+    WHILE         go to state 40
+    DO_WHILE_COM  go to state 41
+    REPEAT        go to state 42
+    IF_COMMAND    go to state 43
+    IF            go to state 44
+    SWITCH_COM    go to state 45
+    SWITCH        go to state 46
+    FUNC_CALL     go to state 47
+    FUNC_NAME     go to state 48
+    COMMANDS      go to state 187
+    COMMAND       go to state 50
+    ATTR          go to state 51
+    EXP           go to state 52
+    UNARY_EXP     go to state 53
+    PRIMITIVE     go to state 54
+    VARIABLE      go to state 55
+
+
+State 187
+
+   35 DEFAULT: S_DEFAULT ':' COMMANDS . TK_END
+
+    TK_END  shift, and go to state 188
+
+
+State 188
+
+   35 DEFAULT: S_DEFAULT ':' COMMANDS TK_END .
+
+    $default  reduce using rule 35 (DEFAULT)
