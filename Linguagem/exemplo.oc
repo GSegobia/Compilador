@@ -1,4 +1,81 @@
-int main()
-{
-	a = b + c;
-}
+
+
+
+function number::func(number a, number b):
+    number c = 5
+
+    if b > 10:
+        c = 10
+    end
+
+    outl :: c
+
+    return c
+end
+
+
+
+function func(bool a, bool b):
+    number d = 7
+
+    outl :: d
+end
+
+
+start:
+    number f = func(5, 7)
+
+    out :: "Valor de f = "
+    outl :: f
+
+    number a = 0
+    number b = 10
+
+    outl :: "Listagem de valores de A: "
+
+    while a < 10:
+        outl :: a
+        a++
+    end
+
+    if a == 7:
+        outl :: "A é 7!"
+    elif a == 10:
+        outl :: "A é 10!"
+    else:
+        out :: "A é "
+        out :: a
+        outl :: "."
+    end
+
+    repeat:
+        outl :: a
+        a--
+    until a > 0
+
+    switch a:
+        case 10:
+            outl :: "AAAAAAAAAAAa"
+        case 20:
+            outl :: "BBBBBBBBBBBB"
+        default:
+            outl :: "CCCCCCCCCC"
+    end
+
+    string first_name
+    string last_name
+
+    out :: "Insira o primeiro nome: "
+    in :: first_name
+
+    out :: "Insira o último o nome: "
+    in :: last_name
+
+    string full_name = first_name << last_name
+
+    outl :: full_name
+
+    number matrix[5, 5]
+    number array[10]
+
+end

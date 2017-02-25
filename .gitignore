@@ -3,3 +3,7 @@
 *.tab.h
 ocean
 /Material/*
+/.idea
+*.cpp
+*/y.output
+*/compiled
